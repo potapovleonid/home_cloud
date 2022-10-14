@@ -6,10 +6,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="home_cloud-client" />
-        <module name="home_cloud-common" />
-        <module name="home_cloud-server" />
+        <module name="common" />
+        <module name="client" />
+        <module name="server" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="home_cloud-client" target="11" />
+      <module name="home_cloud-common" target="1.8" />
+      <module name="home_cloud-server" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
