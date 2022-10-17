@@ -1,3 +1,7 @@
+package com.example.server;
+
+import com.example.common.SendFile;
+import com.example.common.SendObject;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -6,6 +10,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.serialization.ClassResolver;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import org.apache.log4j.BasicConfigurator;
@@ -33,10 +41,10 @@ public class ServerApp {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sh) throws Exception {
-                            sh.pipeline().addLast(new StringEncoder());
-                            sh.pipeline().addLast(new LineBasedFrameDecoder(80));
-                            sh.pipeline().addLast(new StringDecoder());
-                            sh.pipeline().addLast(new ServerHandlerShowStringMsg());
+                            sh.pipeline().addLast(new ObjectEncoder());
+                            sh.pipeline().addLast(new ObjectDecoder(1024 * 1024 * 100,
+                                    ClassResolvers.cacheDisabled(null)));
+                            sh.pipeline().addLast(new CheckObjectHandler());
                         }
                     });
 

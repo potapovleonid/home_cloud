@@ -1,3 +1,5 @@
+package com.example.server;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
