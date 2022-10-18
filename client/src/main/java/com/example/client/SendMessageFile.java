@@ -25,7 +25,10 @@ public class SendMessageFile {
             com.example.common.SendFile sf = new com.example.common.SendFile("1.txt", path);
             eout.writeObject(sf);
             eout.flush();
-        } catch (IOException e) {
+            Object obj = oin.readObject();
+            String sendResult = (String) obj;
+            System.out.println(sendResult);
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

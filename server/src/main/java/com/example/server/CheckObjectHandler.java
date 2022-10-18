@@ -30,6 +30,7 @@ public class CheckObjectHandler extends ChannelInboundHandlerAdapter {
                 throw new Exception("File already exists");
             }
             Files.write(path, sf.getByteBuf(), StandardOpenOption.APPEND);
+            ctx.writeAndFlush("File accept");
         }
     }
 
