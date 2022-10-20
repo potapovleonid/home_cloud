@@ -1,5 +1,6 @@
 package com.example.client;
 
+import com.example.common.SendFile;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 import org.apache.log4j.BasicConfigurator;
@@ -18,25 +19,25 @@ public class SendMessageFile {
         BasicConfigurator.configure();
     }
 
-    public void send(Path path){
+    public static void main(String[] args) {
+        SendMessageFile smf = new SendMessageFile();
+        Path path = Paths.get("client_files", "1.txt");
+        smf.send("1.txt", path);
+    }
+
+    public void send(String filename, Path path){
         try(Socket socket = new Socket("localhost", 8189);) {
-            ObjectEncoderOutputStream eout = new ObjectEncoderOutputStream(socket.getOutputStream());
-            ObjectDecoderInputStream oin = new ObjectDecoderInputStream(socket.getInputStream());
-            com.example.common.SendFile sf = new com.example.common.SendFile("1.txt", path);
-            eout.writeObject(sf);
-            eout.flush();
-            Object obj = oin.readObject();
+            ObjectEncoderOutputStream out = new ObjectEncoderOutputStream(socket.getOutputStream());
+            ObjectDecoderInputStream in = new ObjectDecoderInputStream(socket.getInputStream());
+            SendFile sf = new SendFile(filename, path);
+            out.writeObject(sf);
+            out.flush();
+            Object obj = in.readObject();
             String sendResult = (String) obj;
             System.out.println(sendResult);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        SendMessageFile smf = new SendMessageFile();
-        Path path = Paths.get("client_files", "1.txt");
-        smf.send(path);
     }
 
 }
