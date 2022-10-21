@@ -35,10 +35,7 @@ public class ServerApp {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sh) throws Exception {
-                            sh.pipeline().addLast(new ObjectEncoder());
-                            sh.pipeline().addLast(new ObjectDecoder(1024 * 1024 * 100,
-                                    ClassResolvers.cacheDisabled(null)));
-                            sh.pipeline().addLast(new CheckObjectHandler());
+                            sh.pipeline().addLast(new SaveFileHandler());
                         }
                     });
 
