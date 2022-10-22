@@ -3,8 +3,6 @@ package com.example.server;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -13,7 +11,6 @@ import java.nio.file.FileSystems;
 
 public class SaveFileHandler extends ChannelInboundHandlerAdapter {
 
-    private final Logger logger = Logger.getLogger(SaveFileHandler.class);
     private State state = State.IDLE;
     private int filenameLength;
     private String filename;
@@ -23,7 +20,6 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     private final byte STATUS_SEND_FILE = 25;
 
     public SaveFileHandler() {
-        BasicConfigurator.configure();
     }
 
     @Override
@@ -35,7 +31,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
                 if (checkState == STATUS_SEND_FILE){
                     receivedFileLength = 0L;
                     state = State.NAME_LENGTH;
-                    logger.trace("File state is user send file");
+                    LoggerApp.getLogger().info("File state is user send file");
                 }
             }
 
@@ -43,7 +39,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
                 if (buf.readableBytes() >= 4){
                     filenameLength = buf.readInt();
                     state = State.NAME;
-                    logger.trace("Length name: " + filenameLength + " bytes");
+                    LoggerApp.getLogger().info("Length name: " + filenameLength + " bytes");
                 }
             }
 
@@ -55,14 +51,14 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
                     out = new BufferedOutputStream(new FileOutputStream("server_files" +
                             FileSystems.getDefault().getSeparator() + filename));
                     state = State.FILE_LENGTH;
-                    logger.trace("Filename: " + filename);
+                    LoggerApp.getLogger().info("Filename: " + filename);
                 }
             }
 
             if (state == State.FILE_LENGTH){
                 if (buf.readableBytes() >= 8){
                     fileLength = buf.readLong();
-                    logger.trace("File length: " + fileLength);
+                    LoggerApp.getLogger().info("File length: " + fileLength);
                     state = State.FILE;
                 }
             }
@@ -73,7 +69,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
                     receivedFileLength++;
                     if (receivedFileLength == fileLength){
                         state = State.IDLE;
-                        logger.trace("File received");
+                        LoggerApp.getLogger().info("File received");
                         out.close();
                         break;
                     }
@@ -87,6 +83,10 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (cause.getMessage().equals("An existing connection was forcibly closed by the remote host")){
+            LoggerApp.getLogger().info("Client disconnected");
+            return;
+        }
         cause.printStackTrace();
         ctx.close();
     }

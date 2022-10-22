@@ -7,20 +7,12 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 
 public class ServerApp {
-
-    static Logger logger = Logger.getLogger(ServerApp.class);
 
     private final int PORT;
 
     public ServerApp(int PORT) {
-        BasicConfigurator.configure();
         this.PORT = PORT;
     }
 
@@ -36,6 +28,7 @@ public class ServerApp {
                         @Override
                         protected void initChannel(SocketChannel sh) throws Exception {
                             sh.pipeline().addLast(new SaveFileHandler());
+                            LoggerApp.getLogger().info("Client connection");
                         }
                     });
 
@@ -50,6 +43,7 @@ public class ServerApp {
     }
 
     public static void main(String[] args) {
+        LoggerApp.init();
         new ServerApp(8189).run();
     }
 }
