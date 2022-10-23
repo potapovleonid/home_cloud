@@ -20,10 +20,10 @@ public class ClientApp {
                 Network.getNetwork().getChannel(),
                 finishListener -> {
                     if (!finishListener.isSuccess()){
-                        LoggerApp.getLogger().info(finishListener.cause().getMessage());
+                        LoggerApp.addInfo(finishListener.cause().getMessage());
                     }
                     if (finishListener.isSuccess()){
-                        LoggerApp.getLogger().info("Send file is completed");
+                        LoggerApp.addInfo("Send file is completed");
                     }
                 });
 

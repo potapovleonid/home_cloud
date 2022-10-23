@@ -27,12 +27,12 @@ public class FileSender {
         buf.writeLong(fileLength);
 
         channel.writeAndFlush(buf);
-        LoggerApp.getLogger().info("Sent file info");
+        LoggerApp.addInfo("Sent file info");
 
         ChannelFuture sendOperationFuture = channel.writeAndFlush(region);
         if (completeListener != null){
             sendOperationFuture.addListener(completeListener);
         }
-        LoggerApp.getLogger().info("Sent file");
+        LoggerApp.addInfo("Sent file");
     }
 }

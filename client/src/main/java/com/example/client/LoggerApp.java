@@ -15,4 +15,8 @@ public class LoggerApp {
     public static Logger getLogger() {
         return logger;
     }
+
+    public static void addInfo(String msg){
+        logger.info(msg);
+    }
 }

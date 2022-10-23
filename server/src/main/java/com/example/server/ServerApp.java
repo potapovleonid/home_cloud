@@ -28,7 +28,7 @@ public class ServerApp {
                         @Override
                         protected void initChannel(SocketChannel sh) throws Exception {
                             sh.pipeline().addLast(new SaveFileHandler());
-                            LoggerApp.getLogger().info("Client connection");
+                            LoggerApp.addInfo("Client connection");
                         }
                     });
 
