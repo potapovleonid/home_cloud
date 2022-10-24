@@ -1,4 +1,4 @@
-package com.example.server;
+package com.example.client;
 
 import com.example.common.State;
 import io.netty.buffer.ByteBuf;
@@ -21,9 +21,6 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     private long receivedFileLength;
     private BufferedOutputStream out;
     private final byte STATUS_SEND_FILE = 25;
-
-    public SaveFileHandler() {
-    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -76,7 +73,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
             byte[] byteBufFilename = new byte[filenameLength];
             buf.readBytes(byteBufFilename);
             filename = new String(byteBufFilename, StandardCharsets.UTF_8);
-            out = new BufferedOutputStream(new FileOutputStream("server_files" +
+            out = new BufferedOutputStream(new FileOutputStream("client_files" +
                     FileSystems.getDefault().getSeparator() + filename));
             state = State.FILE_LENGTH;
             LoggerApp.addInfo("Filename: " + filename);
@@ -106,11 +103,8 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (cause.getMessage().equals("An existing connection was forcibly closed by the remote host")){
-            LoggerApp.addInfo("Client disconnected");
-            return;
-        }
         cause.printStackTrace();
         ctx.close();
     }
+
 }

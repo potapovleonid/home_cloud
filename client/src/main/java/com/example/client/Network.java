@@ -26,11 +26,12 @@ public class Network {
                     .remoteAddress("localhost", 8189)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            channel = socketChannel;
+                        protected void initChannel(SocketChannel sh) throws Exception {
+                            sh.pipeline().addLast(new SaveFileHandler());
+                            channel = sh;
                         }
                     });
-            LoggerApp.getLogger().info("Connection complete");
+            LoggerApp.addInfo("Connection complete");
             ChannelFuture channelFuture = clientBootstrap.connect().sync();
             countDownNetworkConnections.countDown();
             channelFuture.channel().closeFuture().sync();

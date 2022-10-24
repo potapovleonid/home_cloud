@@ -1,5 +1,6 @@
 package com.example.server;
 
+import com.example.common.FileSender;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -7,6 +8,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Paths;
 
 public class ServerApp {
 
@@ -29,6 +34,7 @@ public class ServerApp {
                         protected void initChannel(SocketChannel sh) throws Exception {
                             sh.pipeline().addLast(new SaveFileHandler());
                             LoggerApp.addInfo("Client connection");
+                            sendFile(sh);
                         }
                     });
 
@@ -39,6 +45,24 @@ public class ServerApp {
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
+        }
+    }
+
+    private void sendFile(SocketChannel sh) {
+        try {
+            FileSender.sendFile(
+                    Paths.get("server_files" + FileSystems.getDefault().getSeparator() + "welcome.txt"),
+                    sh,
+                    finishListener -> {
+                        if (!finishListener.isSuccess()) {
+                            LoggerApp.addInfo(finishListener.cause().getMessage());
+                        }
+                        if (finishListener.isSuccess()) {
+                            LoggerApp.addInfo("Send file is completed");
+                        }
+                    }, LoggerApp.getLogger());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

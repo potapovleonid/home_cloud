@@ -15,19 +15,18 @@ public class ClientApp {
             new Thread(() -> Network.getNetwork().start(countDownNetworkConnections)).start();
             countDownNetworkConnections.await();
 
-            FileSender.sendFile(
-                Paths.get("client_files" + FileSystems.getDefault().getSeparator() + "1.mp4"),
-                Network.getNetwork().getChannel(),
-                finishListener -> {
-                    if (!finishListener.isSuccess()){
-                        LoggerApp.addInfo(finishListener.cause().getMessage());
-                    }
-                    if (finishListener.isSuccess()){
-                        LoggerApp.addInfo("Send file is completed");
-                    }
-                });
-
-        } catch (IOException | InterruptedException e) {
+//            FileSender.sendFile(
+//                Paths.get("client_files" + FileSystems.getDefault().getSeparator() + "1.mp4"),
+//                Network.getNetwork().getChannel(),
+//                finishListener -> {
+//                    if (!finishListener.isSuccess()){
+//                        LoggerApp.addInfo(finishListener.cause().getMessage());
+//                    }
+//                    if (finishListener.isSuccess()){
+//                        LoggerApp.addInfo("Send file is completed");
+//                    }
+//                });
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

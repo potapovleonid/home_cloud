@@ -1,8 +1,9 @@
-package com.example.client;
+package com.example.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -12,7 +13,7 @@ import java.nio.file.Path;
 public class FileSender {
     private static final byte STATUS_SEND_FILE = 25;
 
-    public static void sendFile(Path path, Channel channel, ChannelFutureListener completeListener) throws IOException {
+    public static void sendFile(Path path, Channel channel, ChannelFutureListener completeListener, Logger logger) throws IOException {
         FileRegion region = new DefaultFileRegion(path.toFile(), 0, Files.size(path));
 
         byte[] filenameBytes = path.getFileName().toString().getBytes(StandardCharsets.UTF_8);
@@ -27,12 +28,12 @@ public class FileSender {
         buf.writeLong(fileLength);
 
         channel.writeAndFlush(buf);
-        LoggerApp.addInfo("Sent file info");
+        logger.info("Sent file info");
 
         ChannelFuture sendOperationFuture = channel.writeAndFlush(region);
         if (completeListener != null){
             sendOperationFuture.addListener(completeListener);
         }
-        LoggerApp.addInfo("Sent file");
+        logger.info("Sent file");
     }
 }
