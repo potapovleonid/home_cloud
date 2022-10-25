@@ -1,5 +1,6 @@
 package com.example.client;
 
+import com.example.common.SaveFileHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -27,11 +28,11 @@ public class Network {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sh) throws Exception {
-                            sh.pipeline().addLast(new SaveFileHandler());
+                            sh.pipeline().addLast(new SaveFileHandler("client_files", LoggerApp.getLogger()));
                             channel = sh;
                         }
                     });
-            LoggerApp.addInfo("Connection complete");
+            LoggerApp.info("Connection complete");
             ChannelFuture channelFuture = clientBootstrap.connect().sync();
             countDownNetworkConnections.countDown();
             channelFuture.channel().closeFuture().sync();

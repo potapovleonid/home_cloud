@@ -16,7 +16,7 @@ public class LoggerApp {
         return logger;
     }
 
-    public static void addInfo(String msg){
+    public static void info(String msg){
         logger.info(msg);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.server;
 
 import com.example.common.FileSender;
+import com.example.common.SaveFileHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -32,8 +33,8 @@ public class ServerApp {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sh) throws Exception {
-                            sh.pipeline().addLast(new SaveFileHandler());
-                            LoggerApp.addInfo("Client connection");
+                            sh.pipeline().addLast(new SaveFileHandler("server_files", LoggerApp.getLogger()));
+                            LoggerApp.info("Client connection");
                             sendFile(sh);
                         }
                     });
@@ -55,10 +56,10 @@ public class ServerApp {
                     sh,
                     finishListener -> {
                         if (!finishListener.isSuccess()) {
-                            LoggerApp.addInfo(finishListener.cause().getMessage());
+                            LoggerApp.info(finishListener.cause().getMessage());
                         }
                         if (finishListener.isSuccess()) {
-                            LoggerApp.addInfo("Send file is completed");
+                            LoggerApp.info("Send file is completed");
                         }
                     }, LoggerApp.getLogger());
         } catch (IOException e) {

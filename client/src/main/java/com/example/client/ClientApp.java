@@ -1,5 +1,7 @@
 package com.example.client;
 
+import com.example.common.FileSender;
+
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Paths;
@@ -15,18 +17,18 @@ public class ClientApp {
             new Thread(() -> Network.getNetwork().start(countDownNetworkConnections)).start();
             countDownNetworkConnections.await();
 
-//            FileSender.sendFile(
-//                Paths.get("client_files" + FileSystems.getDefault().getSeparator() + "1.mp4"),
-//                Network.getNetwork().getChannel(),
-//                finishListener -> {
-//                    if (!finishListener.isSuccess()){
-//                        LoggerApp.addInfo(finishListener.cause().getMessage());
-//                    }
-//                    if (finishListener.isSuccess()){
-//                        LoggerApp.addInfo("Send file is completed");
-//                    }
-//                });
-        } catch (InterruptedException e) {
+            FileSender.sendFile(
+                Paths.get("client_files" + FileSystems.getDefault().getSeparator() + "1.mp4"),
+                Network.getNetwork().getChannel(),
+                finishListener -> {
+                    if (!finishListener.isSuccess()){
+                        LoggerApp.info(finishListener.cause().getMessage());
+                    }
+                    if (finishListener.isSuccess()){
+                        LoggerApp.info("Send file is completed");
+                    }
+                }, LoggerApp.getLogger());
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
