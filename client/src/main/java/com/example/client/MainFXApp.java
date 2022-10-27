@@ -10,9 +10,9 @@ public class MainFXApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(MainFXApp.class.getResource("sample.fxml"));
-        Scene scene = new Scene(loader.load(), 320, 320);
-        stage.setTitle("Cloud");
+        FXMLLoader loader = new FXMLLoader(MainFXApp.class.getResource("main.fxml"));
+        Scene scene = new Scene(loader.load(), 800, 600);
+        stage.setTitle("Home cloud");
         stage.setScene(scene);
         stage.show();
     }
