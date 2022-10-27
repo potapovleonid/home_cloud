@@ -2,7 +2,6 @@ package com.example.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.EmptyByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
@@ -12,7 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
+import java.nio.file.*;
 
 public class SaveFileHandler extends ChannelInboundHandlerAdapter {
 
@@ -27,8 +26,16 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger;
 
     public SaveFileHandler(String pathSaveFiles, Logger logger) {
+        Path saveDirectory = Paths.get(pathSaveFiles);
         this.pathSaveFiles = pathSaveFiles;
         this.logger = logger;
+        if (!Files.exists(saveDirectory)){
+            try {
+                Files.createDirectory(saveDirectory);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
