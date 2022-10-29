@@ -1,10 +1,14 @@
 package com.example.client;
 
+import com.sun.org.apache.bcel.internal.generic.ARETURN;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,8 +75,21 @@ public class PanelController implements Initializable {
         for (Path p : FileSystems.getDefault().getRootDirectories()) {
             diskBox.getItems().add(p.toString());
         }
+
         diskBox.getSelectionModel().select(0);
 
+        filesTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getClickCount() == 2){
+                    Path newPath = Paths.get(pathField.getText()).
+                            resolve(filesTable.getSelectionModel().getSelectedItem().getFilename());
+                    if (Files.isDirectory(newPath)){
+                        updateList(newPath);
+                    }
+                }
+            }
+        });
 
         updateList(Paths.get("."));
     }
@@ -89,4 +106,12 @@ public class PanelController implements Initializable {
         }
     }
 
+    public void btnPathUp(ActionEvent actionEvent) {
+        Path upperDirectoryPath = Paths.get(pathField.getText()).getParent();
+        if (upperDirectoryPath != null) updateList(upperDirectoryPath);
+    }
+
+    public void selectDisk(ActionEvent actionEvent) {
+        updateList(Paths.get(diskBox.getValue()));
+    }
 }

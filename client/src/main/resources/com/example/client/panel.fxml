@@ -11,9 +11,9 @@
       fx:controller="com.example.client.PanelController">
 
 <HBox>
-    <ComboBox fx:id="diskBox" />
+    <ComboBox fx:id="diskBox" onAction="#selectDisk"/>
     <TextField fx:id="pathField" HBox.hgrow="ALWAYS" editable="false" />
-    <Button text="Up" />
+    <Button text="Up" onAction="#btnPathUp" />
 </HBox>
     <TableView fx:id="filesTable" VBox.vgrow="ALWAYS" />
 </VBox>
