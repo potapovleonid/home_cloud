@@ -115,7 +115,7 @@ public class PanelController implements Initializable {
         updateList(Paths.get(diskBox.getValue()));
     }
 
-    public String getSelectedItem(){
+    public String getSelectedFilename(){
         if (!filesTable.isFocused()){
             return null;
         }

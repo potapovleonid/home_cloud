@@ -21,10 +21,9 @@
     <fx:include fx:id="rightPanel" source="panel.fxml" HBox.hgrow="ALWAYS"/>
 </HBox>
     <HBox spacing="5">
-        <Button text="Copy" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <Button text="Move" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <Button text="Delete" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <Button text="Exit" maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#btnExitAction"/>
+        <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Upload on server" onAction="#btnUploadAction"/>
+        <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Download to computer"/>
+        <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Exit" onAction="#btnExitAction"/>
         <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
         </padding>

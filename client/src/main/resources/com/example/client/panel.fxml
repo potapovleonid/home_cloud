@@ -16,4 +16,9 @@
     <Button text="Up" onAction="#btnPathUp" />
 </HBox>
     <TableView fx:id="filesTable" VBox.vgrow="ALWAYS" />
+
+    <properties>
+        <ctrl><fx:reference source="controller"/></ctrl>
+    </properties>
+
 </VBox>
