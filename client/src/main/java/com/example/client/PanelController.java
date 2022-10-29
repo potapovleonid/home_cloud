@@ -114,4 +114,15 @@ public class PanelController implements Initializable {
     public void selectDisk(ActionEvent actionEvent) {
         updateList(Paths.get(diskBox.getValue()));
     }
+
+    public String getSelectedItem(){
+        if (!filesTable.isFocused()){
+            return null;
+        }
+        return filesTable.getSelectionModel().getSelectedItem().getFilename();
+    }
+
+    public Path getCurrentPath(){
+        return Paths.get(pathField.getText());
+    }
 }
