@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FileSender {
-
     public static void sendFile(Path path, Channel channel, ChannelFutureListener completeListener, Logger logger) throws IOException {
         FileRegion region = new DefaultFileRegion(path.toFile(), 0, Files.size(path));
 
@@ -19,7 +18,7 @@ public class FileSender {
         int filenameLength = filenameBytes.length;
         long fileLength = Files.size(path);
 
-        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + filenameLength + filenameBytes.length + 8);
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameLength + 8);
 
         buf.writeByte(SignalBytes.SENDING_FILE.getSignalByte());
         buf.writeInt(filenameLength);

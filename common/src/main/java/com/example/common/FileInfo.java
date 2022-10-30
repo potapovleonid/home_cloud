@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.common;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -73,5 +73,15 @@ public class FileInfo {
             throw new RuntimeException("Unable to create file info from path");
         }
 
+    }
+
+    @Override
+    public String toString() {
+        return "FileInfo{" +
+                "filename='" + filename + '\'' +
+                ", type=" + type +
+                ", size=" + size +
+                ", lastUpdate=" + lastUpdate +
+                '}';
     }
 }

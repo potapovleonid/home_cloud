@@ -1,6 +1,6 @@
 package com.example.client;
 
-import com.sun.org.apache.bcel.internal.generic.ARETURN;
+import com.example.common.FileInfo;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
