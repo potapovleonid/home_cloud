@@ -6,16 +6,16 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.List;
 
 public class SaveFileHandler extends ChannelInboundHandlerAdapter {
 
     private HandlerState handlerState = HandlerState.IDLE;
+
+    private int listLength;
     private int filenameLength;
     private String filename;
     private long fileLength;
@@ -44,6 +44,35 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
         while (buf.readableBytes() > 0){
             if (handlerState == HandlerState.IDLE){
                 checkingSignalByte(buf);
+            }
+
+            if (handlerState == HandlerState.LIST_LENGTH){
+                if (buf.readableBytes() >= 4){
+                    listLength = buf.readInt();
+                    handlerState = HandlerState.LIST;
+                    logger.info("Length list: " + listLength + " bytes");
+                }
+            }
+
+            if (handlerState == HandlerState.LIST){
+                if (buf.readableBytes() >= listLength){
+
+                    logger.info("start download list");
+
+                    byte[] bytesOfTheList = new byte[listLength];
+                    buf.readBytes(bytesOfTheList);
+
+                    ByteArrayInputStream is = new ByteArrayInputStream(bytesOfTheList);
+                    ObjectInputStream ois = new ObjectInputStream(is);
+
+                    List<FileInfo> filesList = (List<FileInfo>) ois.readObject();
+
+                    logger.info(String.format("Files list length %d", filesList.toArray().length));
+
+                    filesList.forEach(s -> System.out.println(s.toString()));
+                    handlerState = HandlerState.IDLE;
+                    logger.info("State: " + handlerState);
+                }
             }
 
             if (handlerState == HandlerState.NAME_LENGTH){
@@ -80,6 +109,10 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
         }
         if (checkState == SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte()){
             logger.info("File sending success");
+        }
+        if (checkState == SignalBytes.SENDING_LIST.getSignalByte()){
+            handlerState = HandlerState.LIST_LENGTH;
+            logger.info("Send file list");
         }
     }
 
