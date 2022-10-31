@@ -35,7 +35,7 @@ public class ServerApp {
                         protected void initChannel(SocketChannel sh) throws Exception {
                             sh.pipeline().addLast(new SaveFileHandler("server_files", LoggerApp.getLogger()));
                             LoggerApp.info("Client connection");
-//                            sendFile(sh);
+                            sendFile(sh);
                         }
                     });
 
@@ -62,6 +62,7 @@ public class ServerApp {
                             LoggerApp.info("Send file is completed");
                         }
                     }, LoggerApp.getLogger());
+            ListSender.sendFile(Paths.get("."), sh, LoggerApp.getLogger());
         } catch (IOException e) {
             e.printStackTrace();
         }
