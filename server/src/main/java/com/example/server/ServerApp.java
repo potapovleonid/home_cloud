@@ -70,6 +70,10 @@ public class ServerApp {
 
     public static void main(String[] args) {
         LoggerApp.init();
+        SQLConnection.connect();
+
         new ServerApp(8189).run();
+
+        SQLConnection.disconnect();
     }
 }
