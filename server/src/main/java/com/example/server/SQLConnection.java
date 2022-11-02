@@ -1,9 +1,6 @@
 package com.example.server;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class SQLConnection {
 
@@ -31,7 +28,35 @@ public class SQLConnection {
         }
     }
 
+    public static boolean addUser(String user, String password){
+        try {
+            String sql = String.format("INSERT INTO users VALUES ('%s', '%s')", user, password);
+            statement.executeUpdate(sql);
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
 
+    public static boolean authorizeUser(String user, String password){
+        try {
+            String sql = String.format("SELECT login, password FROM users WHERE login ='%s' and password ='%s'", user, password);
+            ResultSet rs = statement.executeQuery(sql);
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
+    public static boolean deleteUser(String user, String password){
+        try {
+            String sql = String.format("DELETE FROM users WHERE login ='%s' and password ='%s'", user, password);
+            statement.executeUpdate(sql);
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
 
 }
