@@ -10,8 +10,6 @@ import java.util.concurrent.CountDownLatch;
 public class ClientApp {
 
     public static void main(String[] args) {
-        LoggerApp.init();
-
         try {
             CountDownLatch countDownNetworkConnections = new CountDownLatch(1);
             new Thread(() -> Network.getNetwork().start(countDownNetworkConnections)).start();

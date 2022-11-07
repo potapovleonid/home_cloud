@@ -7,15 +7,20 @@ public class LoggerApp {
 
     private static org.apache.log4j.Logger logger;
 
-    public static Logger getLogger() {
+    private static void checkExistsLoggerAndCreate(){
         if (logger == null){
             logger = Logger.getLogger(ServerApp.class);
             BasicConfigurator.configure();
         }
+    }
+
+    public static Logger getLogger() {
+        checkExistsLoggerAndCreate();
         return logger;
     }
 
     public static void info(String msg){
+        checkExistsLoggerAndCreate();
         logger.info(msg);
     }
 }
