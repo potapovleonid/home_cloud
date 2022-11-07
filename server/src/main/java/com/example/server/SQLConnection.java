@@ -38,9 +38,9 @@ public class SQLConnection {
         }
     }
 
-    public static boolean authorizeUser(String user, String password){
+    public static boolean authorizeUser(String login, String password){
         try {
-            String sql = String.format("SELECT login, password FROM users WHERE login ='%s' and password ='%s'", user, password);
+            String sql = String.format("SELECT login, password FROM users WHERE login ='%s' and password ='%s'", login, password);
             ResultSet rs = statement.executeQuery(sql);
             return rs.next();
         } catch (SQLException e) {
@@ -49,9 +49,9 @@ public class SQLConnection {
         return false;
     }
 
-    public static boolean deleteUser(String user, String password){
+    public static boolean deleteUser(String login, String password){
         try {
-            String sql = String.format("DELETE FROM users WHERE login ='%s' and password ='%s'", user, password);
+            String sql = String.format("DELETE FROM users WHERE login ='%s' and password ='%s'", login, password);
             statement.executeUpdate(sql);
             return true;
         } catch (SQLException e) {

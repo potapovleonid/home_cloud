@@ -33,6 +33,7 @@ public class ServerApp {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sh) throws Exception {
+                            sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger()));
                             sh.pipeline().addLast(new SaveFileHandler("server_files", LoggerApp.getLogger()));
                             LoggerApp.info("Client connection");
                             sendFile(sh);
@@ -69,7 +70,6 @@ public class ServerApp {
     }
 
     public static void main(String[] args) {
-        LoggerApp.init();
         SQLConnection.connect();
 
         new ServerApp(8189).run();
