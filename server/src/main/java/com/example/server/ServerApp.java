@@ -36,7 +36,6 @@ public class ServerApp {
                             sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger()));
                             sh.pipeline().addLast(new SaveFileHandler("server_files", LoggerApp.getLogger()));
                             LoggerApp.info("Client connection");
-//                            sendFile(sh);
                         }
                     });
 
@@ -50,7 +49,7 @@ public class ServerApp {
         }
     }
 
-    private void sendFile(SocketChannel sh) {
+    private void sendFile(SocketChannel sh) throws InterruptedException {
         try {
             FileSender.sendFile(
                     Paths.get("server_files" + FileSystems.getDefault().getSeparator() + "welcome.txt"),
