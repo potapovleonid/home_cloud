@@ -36,7 +36,7 @@ public class ServerApp {
                             sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger()));
                             sh.pipeline().addLast(new SaveFileHandler("server_files", LoggerApp.getLogger()));
                             LoggerApp.info("Client connection");
-                            sendFile(sh);
+//                            sendFile(sh);
                         }
                     });
 

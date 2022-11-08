@@ -1,6 +1,7 @@
 package com.example.server;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
@@ -9,7 +10,9 @@ import java.nio.charset.StandardCharsets;
 
 public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
-    private Logger logger;
+    private final Logger logger;
+    private final byte SUCCESS_AUTH = 127;
+    private final byte FAILED_AUTH = -128;
 
     public AuthorizeHandler(Logger logger) {
         this.logger = logger;
@@ -25,14 +28,39 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         String login = new String(loginBytes, StandardCharsets.UTF_8);
 
+        logger.info(String.format("Login length %d, login: %s", lengthLogin, login));
+
         int lengthPassword = buf.readInt();
-        byte[] passwordBytes = new byte[lengthLogin];
+        byte[] passwordBytes = new byte[lengthPassword];
         buf.readBytes(passwordBytes);
 
         String password = new String(passwordBytes, StandardCharsets.UTF_8);
 
-        if(SQLConnection.authorizeUser(login, password)){
+        boolean resultAuth = SQLConnection.authorizeUser(login, password);
+
+        logger.info(String.format("Result auth: %b", resultAuth));
+
+        if(resultAuth){
             ctx.pipeline().remove(AuthorizeHandler.class);
         }
+
+        sendResponse(ctx, resultAuth);
+    }
+
+    private void sendResponse(ChannelHandlerContext ctx, boolean result){
+        ByteBuf byteBufResponse = getByteBufWithResponse(result);
+
+        ctx.writeAndFlush(byteBufResponse);
+    }
+
+    private ByteBuf getByteBufWithResponse(boolean result) {
+        ByteBuf byteBufResponse = ByteBufAllocator.DEFAULT.directBuffer(1);
+
+        if (result) {
+            byteBufResponse.writeByte(SUCCESS_AUTH);
+        } else {
+            byteBufResponse.writeByte(FAILED_AUTH);
+        }
+        return byteBufResponse;
     }
 }
