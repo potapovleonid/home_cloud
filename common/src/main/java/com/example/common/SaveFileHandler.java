@@ -42,57 +42,28 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         while (buf.readableBytes() > 0) {
-            if (handlerState == HandlerState.IDLE) {
-                checkingSignalByte(buf);
-            }
-
-            if (handlerState == HandlerState.LIST_LENGTH) {
-                if (buf.readableBytes() >= 4) {
-                    listLength = buf.readInt();
-                    handlerState = HandlerState.LIST;
-                    logger.info("Length list: " + listLength + " bytes");
-                }
-            }
-
-            if (handlerState == HandlerState.LIST) {
-                if (buf.readableBytes() >= listLength) {
-
-                    logger.info("start download list");
-
-                    byte[] bytesOfTheList = new byte[listLength];
-                    buf.readBytes(bytesOfTheList);
-
-                    ByteArrayInputStream is = new ByteArrayInputStream(bytesOfTheList);
-                    ObjectInputStream ois = new ObjectInputStream(is);
-
-                    List<FileInfo> filesList = (List<FileInfo>) ois.readObject();
-
-                    logger.info(String.format("Files list length %d", filesList.toArray().length));
-
-                    filesList.forEach(s -> System.out.println(s.toString()));
-                    handlerState = HandlerState.IDLE;
-                    logger.info("State: " + handlerState);
-                }
-            }
-
-            if (handlerState == HandlerState.NAME_LENGTH) {
-                readingFilenameLength(buf);
-            }
-
-            if (handlerState == HandlerState.NAME) {
-                readingFilename(buf);
-            }
-
-            if (handlerState == HandlerState.FILE_LENGTH) {
-                readingFileLength(buf);
-            }
-
-            if (handlerState == HandlerState.FILE) {
-                writingFile(buf, ctx);
-            }
-
-            if (handlerState == HandlerState.CHECK_COMPLETE) {
-
+            switch (handlerState){
+                case IDLE:
+                    checkingSignalByte(buf);
+                    break;
+                case LIST_LENGTH:
+                    readingFileListLength(buf);
+                    break;
+                case LIST:
+                    readingFilesList(buf);
+                    break;
+                case NAME_LENGTH:
+                    readingFilenameLength(buf);
+                    break;
+                case NAME:
+                    readingFilename(buf);
+                    break;
+                case FILE_LENGTH:
+                    readingFileLength(buf);
+                    break;
+                case FILE:
+                    writingFile(buf, ctx);
+                    break;
             }
         }
         if (buf.readableBytes() == 0) {
@@ -113,6 +84,34 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
         if (checkState == SignalBytes.SENDING_LIST.getSignalByte()) {
             handlerState = HandlerState.LIST_LENGTH;
             logger.info("Send file list");
+        }
+    }
+
+    private void readingFileListLength(ByteBuf buf) {
+        if (buf.readableBytes() >= 4) {
+            listLength = buf.readInt();
+            handlerState = HandlerState.LIST;
+            logger.info("Length list: " + listLength + " bytes");
+        }
+    }
+
+    private void readingFilesList(ByteBuf buf) throws IOException, ClassNotFoundException {
+        if (buf.readableBytes() >= listLength) {
+            logger.info("start download list");
+
+            byte[] bytesOfTheList = new byte[listLength];
+            buf.readBytes(bytesOfTheList);
+
+            ByteArrayInputStream is = new ByteArrayInputStream(bytesOfTheList);
+            ObjectInputStream ois = new ObjectInputStream(is);
+
+            List<FileInfo> filesList = (List<FileInfo>) ois.readObject();
+
+            logger.info(String.format("Files list length %d", filesList.toArray().length));
+
+            filesList.forEach(s -> System.out.println(s.toString()));
+            handlerState = HandlerState.IDLE;
+            logger.info("State: " + handlerState);
         }
     }
 
