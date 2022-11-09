@@ -28,6 +28,7 @@ public class Network {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sh) throws Exception {
+                            sh.pipeline().addLast(new AuthHandler(LoggerApp.getLogger()));
                             sh.pipeline().addLast(new SaveFileHandler("client_files", LoggerApp.getLogger()));
                             channel = sh;
                         }

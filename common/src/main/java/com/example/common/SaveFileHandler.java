@@ -13,6 +13,9 @@ import java.util.List;
 
 public class SaveFileHandler extends ChannelInboundHandlerAdapter {
 
+    private final int LENGTH_LONG = 8;
+    private final int LENGTH_INT = 4;
+
     private HandlerState handlerState = HandlerState.IDLE;
 
     private int listLength;
@@ -88,7 +91,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingFileListLength(ByteBuf buf) {
-        if (buf.readableBytes() >= 4) {
+        if (buf.readableBytes() >= LENGTH_INT) {
             listLength = buf.readInt();
             handlerState = HandlerState.LIST;
             logger.info("Length list: " + listLength + " bytes");
@@ -116,7 +119,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingFilenameLength(ByteBuf buf) {
-        if (buf.readableBytes() >= 4) {
+        if (buf.readableBytes() >= LENGTH_INT) {
             filenameLength = buf.readInt();
             handlerState = HandlerState.NAME;
             logger.info("Length name: " + filenameLength + " bytes");
@@ -136,7 +139,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingFileLength(ByteBuf buf) {
-        if (buf.readableBytes() >= 8) {
+        if (buf.readableBytes() >= LENGTH_LONG) {
             fileLength = buf.readLong();
             logger.info("File length: " + fileLength);
             handlerState = HandlerState.FILE;

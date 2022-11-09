@@ -15,7 +15,21 @@ public class ClientApp {
             new Thread(() -> Network.getNetwork().start(countDownNetworkConnections)).start();
             countDownNetworkConnections.await();
 
-            FileSender.sendFile(
+            AuthSender.sendAuthRequest(Network.getNetwork().getChannel(), "des", "des123");
+
+            while (Network.getNetwork().getChannel().pipeline().toMap().size() == 2){
+                Thread.sleep(500);
+            }
+
+            sendFile();
+
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void sendFile() throws IOException {
+        FileSender.sendFile(
                 Paths.get("client_files" + FileSystems.getDefault().getSeparator() + "1.mp4"),
                 Network.getNetwork().getChannel(),
                 finishListener -> {
@@ -26,8 +40,5 @@ public class ClientApp {
                         LoggerApp.info("Send file is completed");
                     }
                 }, LoggerApp.getLogger());
-        } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
-        }
     }
 }

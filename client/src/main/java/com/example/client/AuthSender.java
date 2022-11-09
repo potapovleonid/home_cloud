@@ -5,6 +5,9 @@ import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
 
 public class AuthSender {
+
+//    TODO Callback
+
     public static void sendAuthRequest(Channel channel, String login, String password){
         int lengthLogin = login.getBytes().length;
         byte[] bytesLogin = login.getBytes();
