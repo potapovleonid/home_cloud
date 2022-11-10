@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.client.network;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;

@@ -1,5 +1,7 @@
-package com.example.common;
+package com.example.common.network;
 
+import com.example.common.constants.LengthBytesDataTypes;
+import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
@@ -18,7 +20,8 @@ public class FileSender {
         int filenameLength = filenameBytes.length;
         long fileLength = Files.size(path);
 
-        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + filenameLength + 8);
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
+                LengthBytesDataTypes.INT.getLength() + filenameLength + LengthBytesDataTypes.LONG.getLength());
 
         buf.writeByte(SignalBytes.SENDING_FILE.getSignalByte());
         buf.writeInt(filenameLength);

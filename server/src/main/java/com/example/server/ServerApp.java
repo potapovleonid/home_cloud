@@ -1,7 +1,10 @@
 package com.example.server;
 
-import com.example.common.FileSender;
-import com.example.common.SaveFileHandler;
+import com.example.common.network.FileSender;
+import com.example.common.network.SaveFileHandler;
+import com.example.server.network.AuthorizeHandler;
+import com.example.server.network.ListSender;
+import com.example.server.network.SQLConnection;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

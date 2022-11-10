@@ -1,5 +1,9 @@
-package com.example.common;
+package com.example.common.network;
 
+import com.example.common.FileInfo;
+import com.example.common.constants.HandlerState;
+import com.example.common.constants.LengthBytesDataTypes;
+import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,10 +16,6 @@ import java.nio.file.*;
 import java.util.List;
 
 public class SaveFileHandler extends ChannelInboundHandlerAdapter {
-
-    private final int LENGTH_LONG = 8;
-    private final int LENGTH_INT = 4;
-
     private HandlerState handlerState = HandlerState.IDLE;
 
     private int listLength;
@@ -91,7 +91,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingFileListLength(ByteBuf buf) {
-        if (buf.readableBytes() >= LENGTH_INT) {
+        if (buf.readableBytes() >= LengthBytesDataTypes.INT.getLength()) {
             listLength = buf.readInt();
             handlerState = HandlerState.LIST;
             logger.info("Length list: " + listLength + " bytes");
@@ -119,7 +119,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingFilenameLength(ByteBuf buf) {
-        if (buf.readableBytes() >= LENGTH_INT) {
+        if (buf.readableBytes() >= LengthBytesDataTypes.INT.getLength()) {
             filenameLength = buf.readInt();
             handlerState = HandlerState.NAME;
             logger.info("Length name: " + filenameLength + " bytes");
@@ -139,7 +139,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingFileLength(ByteBuf buf) {
-        if (buf.readableBytes() >= LENGTH_LONG) {
+        if (buf.readableBytes() >= LengthBytesDataTypes.LONG.getLength()) {
             fileLength = buf.readLong();
             logger.info("File length: " + fileLength);
             handlerState = HandlerState.FILE;
@@ -161,7 +161,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void successfullyReceivedFile(ChannelHandlerContext ctx) {
-        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
         buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
         ctx.writeAndFlush(buf);
     }

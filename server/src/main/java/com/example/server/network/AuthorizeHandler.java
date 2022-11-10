@@ -1,5 +1,6 @@
-package com.example.server;
+package com.example.server.network;
 
+import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,8 +12,6 @@ import java.nio.charset.StandardCharsets;
 public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
     private final Logger logger;
-    private final byte SUCCESS_AUTH = 127;
-    private final byte FAILED_AUTH = -128;
 
     public AuthorizeHandler(Logger logger) {
         this.logger = logger;
@@ -57,9 +56,9 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBufResponse = ByteBufAllocator.DEFAULT.directBuffer(1);
 
         if (result) {
-            byteBufResponse.writeByte(SUCCESS_AUTH);
+            byteBufResponse.writeByte(SignalBytes.SUCCESS_AUTH.getSignalByte());
         } else {
-            byteBufResponse.writeByte(FAILED_AUTH);
+            byteBufResponse.writeByte(SignalBytes.FAILED_AUTH.getSignalByte());
         }
         return byteBufResponse;
     }

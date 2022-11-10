@@ -1,7 +1,7 @@
-package com.example.server;
+package com.example.server.network;
 
 import com.example.common.FileInfo;
-import com.example.common.SignalBytes;
+import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;

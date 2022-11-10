@@ -1,4 +1,6 @@
-package com.example.server;
+package com.example.server.network;
+
+import com.example.server.LoggerApp;
 
 import java.sql.*;
 

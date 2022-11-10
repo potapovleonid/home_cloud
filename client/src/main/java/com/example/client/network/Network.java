@@ -1,6 +1,7 @@
-package com.example.client;
+package com.example.client.network;
 
-import com.example.common.SaveFileHandler;
+import com.example.client.LoggerApp;
+import com.example.common.network.SaveFileHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

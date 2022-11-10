@@ -1,5 +1,6 @@
-package com.example.client;
+package com.example.client.network;
 
+import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -8,8 +9,6 @@ import org.apache.log4j.Logger;
 public class AuthHandler extends ChannelInboundHandlerAdapter {
 
     private final Logger logger;
-    private final byte SUCCESS_AUTH = 127;
-    private final byte FAILED_AUTH = -128;
 
     public AuthHandler(Logger logger) {
         this.logger = logger;
@@ -19,11 +18,11 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         byte checkResponse = buf.readByte();
-        if (checkResponse == SUCCESS_AUTH) {
+        if (checkResponse == SignalBytes.SUCCESS_AUTH.getSignalByte()) {
             logger.info("Auth is success");
             ctx.pipeline().remove(AuthHandler.class);
         }
-        if (checkResponse == FAILED_AUTH){
+        if (checkResponse == SignalBytes.FAILED_AUTH.getSignalByte()){
             logger.info("Auth is fail");
         }
     }

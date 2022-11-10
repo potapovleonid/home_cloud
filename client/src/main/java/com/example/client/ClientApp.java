@@ -1,6 +1,8 @@
 package com.example.client;
 
-import com.example.common.FileSender;
+import com.example.client.network.AuthSender;
+import com.example.client.network.Network;
+import com.example.common.network.FileSender;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
