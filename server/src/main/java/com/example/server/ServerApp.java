@@ -52,10 +52,10 @@ public class ServerApp {
         }
     }
 
-    private void sendFile(SocketChannel sh) throws InterruptedException {
+    private void sendFile(SocketChannel sh, String filename) throws InterruptedException {
         try {
             FileSender.sendFile(
-                    Paths.get("server_files" + FileSystems.getDefault().getSeparator() + "welcome.txt"),
+                    Paths.get("server_files" + FileSystems.getDefault().getSeparator() + filename),
                     sh,
                     finishListener -> {
                         if (!finishListener.isSuccess()) {

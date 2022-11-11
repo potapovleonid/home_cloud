@@ -23,16 +23,17 @@ public class ClientApp {
                 Thread.sleep(500);
             }
 
-            sendFile();
+            sendFile("1.mp4");
+            sendFile("2.mp4");
 
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void sendFile() throws IOException {
+    private static void sendFile(String filename) throws IOException {
         FileSender.sendFile(
-                Paths.get("client_files" + FileSystems.getDefault().getSeparator() + "1.mp4"),
+                Paths.get("client_files" + FileSystems.getDefault().getSeparator() + filename),
                 Network.getNetwork().getChannel(),
                 finishListener -> {
                     if (!finishListener.isSuccess()){
