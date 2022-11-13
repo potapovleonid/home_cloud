@@ -1,5 +1,6 @@
 package com.example.common.network;
 
+import com.example.common.CallbackDownload;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
@@ -13,7 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FileSender {
-    public static void sendFile(Path path, Channel channel, ChannelFutureListener completeListener, Logger logger) throws IOException {
+    public static void sendFile(Path path, Channel channel, ChannelFutureListener completeListener,
+                                Logger logger, CallbackDownload callbackDownload) throws IOException {
+        CallbackDownload callback = callbackDownload;
+
         FileRegion region = new DefaultFileRegion(path.toFile(), 0, Files.size(path));
 
         byte[] filenameBytes = path.getFileName().toString().getBytes(StandardCharsets.UTF_8);
@@ -35,6 +39,9 @@ public class FileSender {
         if (completeListener != null){
             sendOperationFuture.addListener(completeListener);
         }
+
+        callbackDownload.isDownload(true);
+
         logger.info("File sent");
     }
 }

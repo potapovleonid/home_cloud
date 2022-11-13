@@ -4,6 +4,7 @@ import com.example.client.network.AuthSender;
 import com.example.client.network.Network;
 import com.example.common.network.FileSender;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Paths;
@@ -42,6 +43,14 @@ public class ClientApp {
                     if (finishListener.isSuccess()){
                         LoggerApp.info("Send file is completed");
                     }
-                }, LoggerApp.getLogger());
+                },
+                LoggerApp.getLogger(),
+                resultDownload -> {
+                    if (resultDownload){
+                        JOptionPane.showMessageDialog(null, "File's success downloaded");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "File's fail downloaded");
+                    }
+                });
     }
 }

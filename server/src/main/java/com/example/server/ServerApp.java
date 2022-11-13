@@ -1,5 +1,6 @@
 package com.example.server;
 
+import com.example.common.CallbackDownload;
 import com.example.common.network.FileSender;
 import com.example.common.network.SaveFileHandler;
 import com.example.server.network.AuthorizeHandler;
@@ -64,7 +65,15 @@ public class ServerApp {
                         if (finishListener.isSuccess()) {
                             LoggerApp.info("Send file is completed");
                         }
-                    }, LoggerApp.getLogger());
+                    },
+                    LoggerApp.getLogger(),
+                    resultDownload -> {
+                        if (resultDownload){
+                            LoggerApp.info("Success download in callback");
+                        } else {
+                            LoggerApp.info("Failed download in callback");
+                        }
+                    });
             ListSender.sendFile(Paths.get("."), sh, LoggerApp.getLogger());
         } catch (IOException e) {
             e.printStackTrace();
