@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
 
-public class AuthSender {
+public class AuthorizeSender {
 
 //    TODO Callback
 

@@ -1,5 +1,6 @@
-package com.example.client;
+package com.example.client.fx;
 
+import com.example.client.PanelController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

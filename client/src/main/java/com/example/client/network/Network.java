@@ -1,5 +1,6 @@
 package com.example.client.network;
 
+import com.example.client.CallbackAuthenticated;
 import com.example.client.LoggerApp;
 import com.example.common.network.SaveFileHandler;
 import io.netty.bootstrap.Bootstrap;
@@ -17,7 +18,7 @@ public class Network {
     private static Network myNetwork = new Network();
     private Channel channel;
 
-    public void start(CountDownLatch countDownNetworkConnections) {
+    public void start(CountDownLatch countDownNetworkConnections, CallbackAuthenticated callbackAuthenticated) {
         EventLoopGroup group = new NioEventLoopGroup();
 
         try {
@@ -29,7 +30,7 @@ public class Network {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sh) throws Exception {
-                            sh.pipeline().addLast(new AuthHandler(LoggerApp.getLogger()));
+                            sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger(), callbackAuthenticated));
                             sh.pipeline().addLast(new SaveFileHandler("client_files", LoggerApp.getLogger()));
                             channel = sh;
                         }

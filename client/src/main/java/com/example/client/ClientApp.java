@@ -1,6 +1,6 @@
 package com.example.client;
 
-import com.example.client.network.AuthSender;
+import com.example.client.network.AuthorizeSender;
 import com.example.client.network.Network;
 import com.example.common.network.FileSender;
 
@@ -10,24 +10,26 @@ import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
 
-public class ClientApp {
+public class ClientApp{
 
     public static void main(String[] args) {
         try {
             CountDownLatch countDownNetworkConnections = new CountDownLatch(1);
-            new Thread(() -> Network.getNetwork().start(countDownNetworkConnections)).start();
+            new Thread(() -> Network.getNetwork().start(countDownNetworkConnections,
+            resultAuth -> {
+                if (resultAuth){
+                    LoggerApp.info("Auth success, delete auth pipeline");
+                    sendFile("1.mp4");
+                    sendFile("2.mp4");
+                } else {
+                    LoggerApp.info("Please try authenticate again");
+                }
+            })).start();
             countDownNetworkConnections.await();
 
-            AuthSender.sendAuthRequest(Network.getNetwork().getChannel(), "des", "des123");
+            AuthorizeSender.sendAuthRequest(Network.getNetwork().getChannel(), "des", "des123");
 
-            while (Network.getNetwork().getChannel().pipeline().toMap().size() == 2){
-                Thread.sleep(500);
-            }
-
-            sendFile("1.mp4");
-            sendFile("2.mp4");
-
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

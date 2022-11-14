@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="250.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.AuthController">
+<AnchorPane prefHeight="250.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.fx.AuthController">
    <children>
       <VBox alignment="CENTER" prefHeight="250.0" prefWidth="600.0">
          <Label alignment="CENTER" contentDisplay="CENTER" text="Welcome on home cloud service. Please Authorize" textAlignment="CENTER">

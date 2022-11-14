@@ -9,7 +9,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.HBox?>
 <VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.client.Controller">
+      fx:controller="com.example.client.fx.Controller">
     <MenuBar>
         <Menu text="File">
             <MenuItem text="Exit" onAction="#btnExitAction"/>
