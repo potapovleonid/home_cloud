@@ -1,4 +1,4 @@
-package com.example.common.network;
+package com.example.server.network;
 
 import com.example.common.FileInfo;
 import com.example.common.constants.HandlerState;
@@ -20,12 +20,11 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
 
     private int listLength;
     private int filenameLength;
-    private String filename;
     private long fileLength;
     private long receivedFileLength;
     private BufferedOutputStream out;
 
-    private final String pathSaveFiles;
+    private String pathSaveFiles;
     private final Logger logger;
 
     public SaveFileHandler(String pathSaveFiles, Logger logger) {
@@ -43,9 +42,13 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (setUserLoginIfMsgIsLogin(msg)) {
+            return;
+        }
+
         ByteBuf buf = (ByteBuf) msg;
         while (buf.readableBytes() > 0) {
-            switch (handlerState){
+            switch (handlerState) {
                 case IDLE:
                     checkingSignalByte(buf);
                     break;
@@ -72,6 +75,15 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
         if (buf.readableBytes() == 0) {
             buf.release();
         }
+    }
+
+    private boolean setUserLoginIfMsgIsLogin(Object msg) {
+        if (msg instanceof String) {
+            String userLogin = (String) msg;
+            pathSaveFiles += FileSystems.getDefault().getSeparator() + userLogin;
+            return true;
+        }
+        return false;
     }
 
     private void checkingSignalByte(ByteBuf buf) {
@@ -130,11 +142,24 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
         if (buf.readableBytes() >= filenameLength) {
             byte[] byteBufFilename = new byte[filenameLength];
             buf.readBytes(byteBufFilename);
-            filename = new String(byteBufFilename, StandardCharsets.UTF_8);
+            String filename = new String(byteBufFilename, StandardCharsets.UTF_8);
+
+            checkExistsFilePathAndCreate();
+
             out = new BufferedOutputStream(new FileOutputStream(pathSaveFiles +
                     FileSystems.getDefault().getSeparator() + filename));
             handlerState = HandlerState.FILE_LENGTH;
             logger.info("Filename: " + filename);
+        }
+    }
+
+    private void checkExistsFilePathAndCreate() {
+        if (!Files.exists(Paths.get(pathSaveFiles))) {
+            try {
+                Files.createDirectory(Paths.get(pathSaveFiles));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -167,7 +192,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (cause.getMessage().equals("An existing connection was forcibly closed by the remote host")) {
             logger.info("Client disconnected");
             return;

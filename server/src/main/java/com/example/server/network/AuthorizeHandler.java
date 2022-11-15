@@ -41,6 +41,7 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         if(resultAuth){
             ctx.pipeline().remove(AuthorizeHandler.class);
+            ctx.fireChannelRead(login);
         }
 
         sendResponse(ctx, resultAuth);

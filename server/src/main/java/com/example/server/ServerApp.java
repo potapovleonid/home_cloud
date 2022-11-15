@@ -1,11 +1,8 @@
 package com.example.server;
 
-import com.example.common.CallbackDownload;
-import com.example.common.network.FileSender;
-import com.example.common.network.SaveFileHandler;
 import com.example.server.network.AuthorizeHandler;
-import com.example.server.network.ListSender;
 import com.example.server.network.SQLConnection;
+import com.example.server.network.SaveFileHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -13,10 +10,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Paths;
 
 public class ServerApp {
 
@@ -36,7 +29,7 @@ public class ServerApp {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel sh) throws Exception {
+                        protected void initChannel(SocketChannel sh) {
                             sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger()));
                             sh.pipeline().addLast(new SaveFileHandler("server_files", LoggerApp.getLogger()));
                             LoggerApp.info("Client connection");
@@ -50,33 +43,6 @@ public class ServerApp {
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
-        }
-    }
-
-    private void sendFile(SocketChannel sh, String filename) throws InterruptedException {
-        try {
-            FileSender.sendFile(
-                    Paths.get("server_files" + FileSystems.getDefault().getSeparator() + filename),
-                    sh,
-                    finishListener -> {
-                        if (!finishListener.isSuccess()) {
-                            LoggerApp.info(finishListener.cause().getMessage());
-                        }
-                        if (finishListener.isSuccess()) {
-                            LoggerApp.info("Send file is completed");
-                        }
-                    },
-                    LoggerApp.getLogger(),
-                    resultDownload -> {
-                        if (resultDownload){
-                            LoggerApp.info("Success download in callback");
-                        } else {
-                            LoggerApp.info("Failed download in callback");
-                        }
-                    });
-            ListSender.sendFile(Paths.get("."), sh, LoggerApp.getLogger());
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
