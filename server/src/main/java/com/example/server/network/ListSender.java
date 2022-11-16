@@ -16,22 +16,26 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ListSender {
-    public static void sendFile(Path path, Channel channel, Logger logger) throws IOException {
-        List<FileInfo> files = Files.list(path).map(FileInfo::new).collect(Collectors.toList());
+    public static void sendList(Path path, Channel channel, Logger logger){
+        try {
+            List<FileInfo> files = Files.list(path).map(FileInfo::new).collect(Collectors.toList());
 
-        byte[] bytesOfTheList = listToByteArray(files);
-        int listFilesLength = bytesOfTheList.length;
+            byte[] bytesOfTheList = listToByteArray(files);
+            int listFilesLength = bytesOfTheList.length;
 
-        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4);
+            ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4);
 
-        buf.writeByte(SignalBytes.SENDING_LIST.getSignalByte());
-        buf.writeInt(listFilesLength);
+            buf.writeByte(SignalBytes.SENDING_LIST.getSignalByte());
+            buf.writeInt(listFilesLength);
 
-        channel.writeAndFlush(buf);
+            channel.writeAndFlush(buf);
 
-        buf = ByteBufAllocator.DEFAULT.directBuffer(listFilesLength);
-        buf.writeBytes(bytesOfTheList);
-        channel.writeAndFlush(buf);
+            buf = ByteBufAllocator.DEFAULT.directBuffer(listFilesLength);
+            buf.writeBytes(bytesOfTheList);
+            channel.writeAndFlush(buf);
+        } catch (IOException e) {
+            logger.warn(e.getMessage());
+        }
     }
 
 

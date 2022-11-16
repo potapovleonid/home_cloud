@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -50,12 +51,12 @@ public class PanelController implements Initializable {
             @Override
             protected void updateItem(Long item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item == null || empty){
+                if (item == null || empty) {
                     setText(null);
                     setStyle("");
                 } else {
                     String text = String.format("%,d bytes", item);
-                    if (item == -1L){
+                    if (item == -1L) {
                         text = "[DIR]";
                     }
                     setText(text);
@@ -81,10 +82,10 @@ public class PanelController implements Initializable {
         filesTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (event.getClickCount() == 2){
+                if (event.getClickCount() == 2) {
                     Path newPath = Paths.get(pathField.getText()).
                             resolve(filesTable.getSelectionModel().getSelectedItem().getFilename());
-                    if (Files.isDirectory(newPath)){
+                    if (Files.isDirectory(newPath)) {
                         updateList(newPath);
                     }
                 }
@@ -106,6 +107,12 @@ public class PanelController implements Initializable {
         }
     }
 
+    public void updateCloudList(List<FileInfo> list) {
+        filesTable.getItems().clear();
+        filesTable.getItems().addAll(list);
+        filesTable.sort();
+    }
+
     public void btnPathUp(ActionEvent actionEvent) {
         Path upperDirectoryPath = Paths.get(pathField.getText()).getParent();
         if (upperDirectoryPath != null) updateList(upperDirectoryPath);
@@ -115,14 +122,14 @@ public class PanelController implements Initializable {
         updateList(Paths.get(diskBox.getValue()));
     }
 
-    public String getSelectedFilename(){
-        if (!filesTable.isFocused()){
+    public String getSelectedFilename() {
+        if (!filesTable.isFocused()) {
             return null;
         }
         return filesTable.getSelectionModel().getSelectedItem().getFilename();
     }
 
-    public Path getCurrentPath(){
+    public Path getCurrentPath() {
         return Paths.get(pathField.getText());
     }
 }

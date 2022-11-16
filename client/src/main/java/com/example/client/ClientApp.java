@@ -6,11 +6,12 @@ import com.example.common.network.FileSender;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
 public class ClientApp{
+
+    private static final MainFXApp mainFXApp = new MainFXApp();
 
     public static void main(String[] args) {
         try {
@@ -19,8 +20,9 @@ public class ClientApp{
             resultAuth -> {
                 if (resultAuth){
                     LoggerApp.info("Auth success, delete auth pipeline");
-                    sendFile("1.mp4");
-                    sendFile("2.mp4");
+                    mainFXApp.startMainPanel();
+//                    sendFile("1.mp4");
+//                    sendFile("2.mp4");
                 } else {
                     LoggerApp.info("Please try authenticate again");
                 }
@@ -34,9 +36,9 @@ public class ClientApp{
         }
     }
 
-    private static void sendFile(String filename) throws IOException {
+    private static void sendFile(Path path) throws IOException {
         FileSender.sendFile(
-                Paths.get("client_files" + FileSystems.getDefault().getSeparator() + filename),
+                path,
                 Network.getNetwork().getChannel(),
                 finishListener -> {
                     if (!finishListener.isSuccess()){

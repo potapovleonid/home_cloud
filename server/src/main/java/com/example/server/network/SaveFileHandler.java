@@ -189,6 +189,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
         buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
         ctx.writeAndFlush(buf);
+        ListSender.sendList(Paths.get(pathSaveFiles), ctx.channel(), logger);
     }
 
     @Override
@@ -197,7 +198,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
             logger.info("Client disconnected");
             return;
         }
-        cause.printStackTrace();
+        logger.warn(cause.getMessage());
         ctx.close();
     }
 }
