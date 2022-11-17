@@ -20,10 +20,7 @@ import java.nio.file.Path;
 public class Controller {
 
     @FXML
-    VBox leftPanel;
-
-    @FXML
-    PanelCloudController rightPanel;
+    VBox leftPanel, rightPanel;
 
     public void btnExitAction(ActionEvent actionEvent) {
         Platform.exit();
@@ -70,7 +67,7 @@ public class Controller {
 
     public void btnDownloadAction(ActionEvent actionEvent){
         PanelController tLeftPanel = (PanelController) leftPanel.getProperties().get("ctrl");
-        PanelCloudController tRightPanel = rightPanel;
+        PanelController tRightPanel = (PanelController) rightPanel.getProperties().get("ctrl");
 
         if (tRightPanel.getSelectedFilename() != null){
 //            TODO download

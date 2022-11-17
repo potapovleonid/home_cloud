@@ -8,14 +8,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
 import java.net.URL;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class PanelCloudController implements Initializable {
 
     @FXML
-    TableView<FileInfo> cloudTables;
+    TableView<FileInfo> rightPanel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -49,24 +48,21 @@ public class PanelCloudController implements Initializable {
             }
         });
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        cloudTables.getColumns().addAll(fileTypeColumn, fileNameColumn, fileSizeColumn);
-        cloudTables.getSortOrder().add(fileTypeColumn);
-
+        rightPanel.getColumns().addAll(fileTypeColumn, fileNameColumn, fileSizeColumn);
+        rightPanel.getSortOrder().add(fileTypeColumn);
     }
 
     public void updateCloudList(List<FileInfo> list) {
-        cloudTables.getItems().clear();
-        cloudTables.getItems().addAll(list);
-        cloudTables.sort();
+        rightPanel.getItems().clear();
+        rightPanel.getItems().addAll(list);
+        rightPanel.sort();
     }
 
     public String getSelectedFilename() {
-        if (!cloudTables.isFocused()) {
+        if (!rightPanel.isFocused()) {
             return null;
         }
-        return cloudTables.getSelectionModel().getSelectedItem().getFilename();
+        return rightPanel.getSelectionModel().getSelectedItem().getFilename();
     }
 
 }
