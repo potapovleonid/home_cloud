@@ -1,6 +1,7 @@
 package com.example.client.fx;
 
 import com.example.client.LoggerApp;
+import com.example.client.PanelCloudController;
 import com.example.client.PanelController;
 import com.example.client.network.Network;
 import com.example.common.network.FileSender;
@@ -19,7 +20,10 @@ import java.nio.file.Path;
 public class Controller {
 
     @FXML
-    VBox leftPanel, rightPanel;
+    VBox leftPanel;
+
+    @FXML
+    PanelCloudController rightPanel;
 
     public void btnExitAction(ActionEvent actionEvent) {
         Platform.exit();
@@ -48,15 +52,17 @@ public class Controller {
             FileSender.sendFile(
                     tLeftPanel.getCurrentPath(),
                     Network.getNetwork().getChannel(),
-                    null,
-                    LoggerApp.getLogger(),
-                    resultDownload -> {
-                        if (resultDownload){
-                            JOptionPane.showMessageDialog(null, "File's success downloaded");
-                        } else {
+                    finishListener -> {
+                        if (!finishListener.isSuccess()){
                             JOptionPane.showMessageDialog(null, "File's fail downloaded");
+                            LoggerApp.info(finishListener.cause().getMessage());
                         }
-                    });
+                        if (finishListener.isSuccess()){
+                            JOptionPane.showMessageDialog(null, "File's success downloaded");
+                            LoggerApp.info("Send file is completed");
+                        }
+                    },
+                    LoggerApp.getLogger());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,7 +70,7 @@ public class Controller {
 
     public void btnDownloadAction(ActionEvent actionEvent){
         PanelController tLeftPanel = (PanelController) leftPanel.getProperties().get("ctrl");
-        PanelController tRightPanel = (PanelController) leftPanel.getProperties().get("ctrl");
+        PanelCloudController tRightPanel = rightPanel;
 
         if (tRightPanel.getSelectedFilename() != null){
 //            TODO download

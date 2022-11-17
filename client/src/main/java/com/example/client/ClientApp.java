@@ -21,8 +21,6 @@ public class ClientApp{
                 if (resultAuth){
                     LoggerApp.info("Auth success, delete auth pipeline");
                     mainFXApp.startMainPanel();
-//                    sendFile("1.mp4");
-//                    sendFile("2.mp4");
                 } else {
                     LoggerApp.info("Please try authenticate again");
                 }
@@ -34,27 +32,5 @@ public class ClientApp{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    private static void sendFile(Path path) throws IOException {
-        FileSender.sendFile(
-                path,
-                Network.getNetwork().getChannel(),
-                finishListener -> {
-                    if (!finishListener.isSuccess()){
-                        LoggerApp.info(finishListener.cause().getMessage());
-                    }
-                    if (finishListener.isSuccess()){
-                        LoggerApp.info("Send file is completed");
-                    }
-                },
-                LoggerApp.getLogger(),
-                resultDownload -> {
-                    if (resultDownload){
-                        JOptionPane.showMessageDialog(null, "File's success downloaded");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "File's fail downloaded");
-                    }
-                });
     }
 }

@@ -15,7 +15,7 @@ import java.nio.file.Path;
 
 public class FileSender {
     public static void sendFile(Path path, Channel channel, ChannelFutureListener completeListener,
-                                Logger logger, CallbackDownload callbackDownload) throws IOException {
+                                Logger logger) throws IOException {
 
         FileRegion region = new DefaultFileRegion(path.toFile(), 0, Files.size(path));
 
@@ -38,8 +38,6 @@ public class FileSender {
         if (completeListener != null){
             sendOperationFuture.addListener(completeListener);
         }
-
-        callbackDownload.isDownload(true);
 
         logger.info("File sent");
     }

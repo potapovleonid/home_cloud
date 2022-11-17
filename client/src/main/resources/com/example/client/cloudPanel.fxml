@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.client.PanelCloudController">
+<HBox>
+</HBox>
+
+    <TableView fx:id="cloudTables" VBox.vgrow="ALWAYS"/>
+
+</VBox>
