@@ -173,9 +173,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void successfullyReceivedFile(ChannelHandlerContext ctx) {
-        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
-        buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
-        ctx.writeAndFlush(buf);
+        ctx.writeAndFlush(new ResponseStatusComplete(MsgType.RECEIVED_FILE, true));
     }
 
     @Override
