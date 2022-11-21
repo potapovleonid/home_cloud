@@ -3,6 +3,7 @@ package com.example.common.constants;
 public enum SignalBytes {
     SENDING_FILE((byte) 25),
     SENDING_LIST((byte) 23),
+    REQUEST_FILE((byte) 105),
     RECEIVED_SUCCESS_FILE((byte) 17),
     SUCCESS_AUTH((byte) 127),
     FAILED_AUTH((byte) -128);
