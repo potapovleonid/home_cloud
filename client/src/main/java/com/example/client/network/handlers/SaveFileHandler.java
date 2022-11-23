@@ -1,11 +1,11 @@
-package com.example.client.network;
+package com.example.client.network.handlers;
 
+import com.example.client.network.ResponseStatusComplete;
 import com.example.common.FileInfo;
 import com.example.common.constants.HandlerState;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
@@ -173,7 +173,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void successfullyReceivedFile(ChannelHandlerContext ctx) {
-        ctx.writeAndFlush(new ResponseStatusComplete(MsgType.RECEIVED_FILE, true));
+        ctx.writeAndFlush(new ResponseStatusComplete(true));
     }
 
     @Override

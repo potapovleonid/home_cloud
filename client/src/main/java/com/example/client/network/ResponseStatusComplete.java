@@ -4,8 +4,7 @@ public class ResponseStatusComplete extends ResponseOrRequest {
 
     private final boolean status;
 
-    public ResponseStatusComplete(MsgType type, boolean status) {
-        super(type);
+    public ResponseStatusComplete(boolean status) {
         this.status = status;
     }
 

@@ -1,12 +1,9 @@
 package com.example.client;
 
-import com.example.client.network.AuthorizeSender;
 import com.example.client.network.Network;
-import com.example.common.network.FileSender;
+import com.example.client.network.RequestAuthorize;
+import com.example.client.network.RequestFile;
 
-import javax.swing.*;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
 public class ClientApp{
@@ -20,14 +17,16 @@ public class ClientApp{
             resultAuth -> {
                 if (resultAuth){
                     LoggerApp.info("Auth success, delete auth pipeline");
-                    mainFXApp.startMainPanel();
+                    Network.getNetwork().getChannel().writeAndFlush(new RequestFile("1.mp4"));
+                    LoggerApp.info("Sent request");
+//                    mainFXApp.startMainPanel();
                 } else {
                     LoggerApp.info("Please try authenticate again");
                 }
             })).start();
             countDownNetworkConnections.await();
 
-            AuthorizeSender.sendAuthRequest(Network.getNetwork().getChannel(), "des", "des123");
+            Network.getNetwork().getChannel().writeAndFlush(new RequestAuthorize("des", "des123"));
 
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -4,8 +4,7 @@ public class RequestFile extends ResponseOrRequest{
 
     private final String fileName;
 
-    public RequestFile(MsgType type, String fileName) {
-        super(type);
+    public RequestFile(String fileName) {
         this.fileName = fileName;
     }
 

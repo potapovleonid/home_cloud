@@ -1,4 +1,4 @@
-package com.example.client.network;
+package com.example.client.network.handlers;
 
 import com.example.client.CallbackAuthenticated;
 import com.example.common.constants.SignalBytes;
