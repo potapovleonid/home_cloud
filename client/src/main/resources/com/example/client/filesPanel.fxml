@@ -8,7 +8,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TextField?>
 <VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.client.PanelController">
+      fx:controller="com.example.client.fx.PanelController">
 
 <HBox>
     <ComboBox fx:id="diskBox" onAction="#selectDisk"/>

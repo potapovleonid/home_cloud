@@ -17,9 +17,9 @@ public class ClientApp{
             resultAuth -> {
                 if (resultAuth){
                     LoggerApp.info("Auth success, delete auth pipeline");
-                    Network.getNetwork().getChannel().writeAndFlush(new RequestFile("1.mp4"));
-                    LoggerApp.info("Sent request");
-//                    mainFXApp.startMainPanel();
+//                    Network.getNetwork().getChannel().writeAndFlush(new RequestFile("1.mp4"));
+//                    LoggerApp.info("Sent request");
+                    mainFXApp.startMainPanel();
                 } else {
                     LoggerApp.info("Please try authenticate again");
                 }

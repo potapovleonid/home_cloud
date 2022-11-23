@@ -1,8 +1,6 @@
 package com.example.client.fx;
 
 import com.example.client.LoggerApp;
-import com.example.client.PanelCloudController;
-import com.example.client.PanelController;
 import com.example.client.network.Network;
 import com.example.common.network.FileSender;
 import javafx.application.Platform;

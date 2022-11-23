@@ -4,8 +4,12 @@
 <?import javafx.scene.control.TableView?>
 
 <VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.client.PanelCloudController">
+      fx:controller="com.example.client.fx.PanelCloudController">
 
     <TableView fx:id="rightPanel" VBox.vgrow="ALWAYS"/>
+
+    <properties>
+        <ctrl><fx:reference source="controller"/></ctrl>
+    </properties>
 
 </VBox>

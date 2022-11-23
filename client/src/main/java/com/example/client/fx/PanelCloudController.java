@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.client.fx;
 
 import com.example.common.FileInfo;
 import javafx.beans.property.SimpleObjectProperty;
