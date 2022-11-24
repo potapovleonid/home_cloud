@@ -19,8 +19,9 @@ import java.util.concurrent.CountDownLatch;
 public class Network {
     private static final Network myNetwork = new Network();
     private Channel channel;
+    private CallbackAuthenticated callbackAuthenticated;
 
-    public void start(CountDownLatch countDownNetworkConnections, CallbackAuthenticated callbackAuthenticated) {
+    public void start(CountDownLatch countDownNetworkConnections) {
         EventLoopGroup group = new NioEventLoopGroup();
 
         try {
@@ -53,5 +54,9 @@ public class Network {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public void setCallbackAuthenticated(CallbackAuthenticated callbackAuthenticated) {
+        this.callbackAuthenticated = callbackAuthenticated;
     }
 }

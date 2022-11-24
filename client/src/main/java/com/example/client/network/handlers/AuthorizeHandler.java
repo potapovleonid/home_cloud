@@ -22,12 +22,10 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         ByteBuf buf = (ByteBuf) msg;
         byte checkResponse = buf.readByte();
         if (checkResponse == SignalBytes.SUCCESS_AUTH.getSignalByte()) {
-            logger.info("Auth is success");
             ctx.pipeline().remove(AuthorizeHandler.class);
             callbackAuthenticated.isAuthorize(true);
         }
         if (checkResponse == SignalBytes.FAILED_AUTH.getSignalByte()){
-            logger.info("Auth is fail");
             callbackAuthenticated.isAuthorize(false);
         }
     }
