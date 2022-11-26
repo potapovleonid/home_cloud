@@ -19,7 +19,6 @@ import java.util.concurrent.CountDownLatch;
 public class Network {
     private static final Network myNetwork = new Network();
     private Channel channel;
-    private CallbackAuthenticated callbackAuthenticated;
 
     public void start(CountDownLatch countDownNetworkConnections) {
         EventLoopGroup group = new NioEventLoopGroup();
@@ -34,7 +33,7 @@ public class Network {
                         @Override
                         protected void initChannel(SocketChannel sh) {
                             sh.pipeline().addLast(new OutboundHandler());
-                            sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger(), callbackAuthenticated));
+                            sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger()));
                             sh.pipeline().addLast(new SaveFileHandler("client_files", LoggerApp.getLogger()));
                             channel = sh;
                         }
@@ -57,6 +56,6 @@ public class Network {
     }
 
     public void setCallbackAuthenticated(CallbackAuthenticated callbackAuthenticated) {
-        this.callbackAuthenticated = callbackAuthenticated;
+        channel.pipeline().get(AuthorizeHandler.class).setCallbackAuthenticated(callbackAuthenticated);
     }
 }

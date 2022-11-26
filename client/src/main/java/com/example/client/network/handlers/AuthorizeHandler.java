@@ -10,11 +10,10 @@ import org.apache.log4j.Logger;
 public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
     private final Logger logger;
-    private final CallbackAuthenticated callbackAuthenticated;
+    private CallbackAuthenticated callbackAuthenticated;
 
-    public AuthorizeHandler(Logger logger, CallbackAuthenticated callbackAuthenticated) {
+    public AuthorizeHandler(Logger logger) {
         this.logger = logger;
-        this.callbackAuthenticated = callbackAuthenticated;
     }
 
     @Override
@@ -22,12 +21,18 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         ByteBuf buf = (ByteBuf) msg;
         byte checkResponse = buf.readByte();
         if (checkResponse == SignalBytes.SUCCESS_AUTH.getSignalByte()) {
-            ctx.pipeline().remove(AuthorizeHandler.class);
+            logger.info("Get signal byte " + SignalBytes.SUCCESS_AUTH.getSignalByte() + " - Authorize is success");
             callbackAuthenticated.isAuthorize(true);
+            ctx.pipeline().remove(AuthorizeHandler.class);
         }
         if (checkResponse == SignalBytes.FAILED_AUTH.getSignalByte()){
+            logger.info("Get signal byte " + SignalBytes.FAILED_AUTH.getSignalByte() + " - Authorize is fail");
             callbackAuthenticated.isAuthorize(false);
         }
+    }
+
+    public void setCallbackAuthenticated(CallbackAuthenticated callbackAuthenticated){
+        this.callbackAuthenticated = callbackAuthenticated;
     }
 
     @Override
