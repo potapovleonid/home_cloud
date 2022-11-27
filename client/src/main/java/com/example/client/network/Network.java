@@ -1,10 +1,11 @@
 package com.example.client.network;
 
-import com.example.client.CallbackAuthenticated;
+import com.example.client.callbacks.CallbackAuthenticated;
 import com.example.client.LoggerApp;
+import com.example.client.callbacks.CallbackGettingFileList;
 import com.example.client.network.handlers.AuthorizeHandler;
 import com.example.client.network.handlers.OutboundHandler;
-import com.example.client.network.handlers.SaveFileHandler;
+import com.example.client.network.handlers.IncomingHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -34,7 +35,7 @@ public class Network {
                         protected void initChannel(SocketChannel sh) {
                             sh.pipeline().addLast(new OutboundHandler());
                             sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger()));
-                            sh.pipeline().addLast(new SaveFileHandler("client_files", LoggerApp.getLogger()));
+                            sh.pipeline().addLast(new IncomingHandler("client_files", LoggerApp.getLogger()));
                             channel = sh;
                         }
                     });
@@ -55,7 +56,11 @@ public class Network {
         return channel;
     }
 
-    public void setCallbackAuthenticated(CallbackAuthenticated callbackAuthenticated) {
-        channel.pipeline().get(AuthorizeHandler.class).setCallbackAuthenticated(callbackAuthenticated);
+    public void setCallbackAuthenticated(CallbackAuthenticated callback) {
+        channel.pipeline().get(AuthorizeHandler.class).setCallbackAuthenticated(callback);
+    }
+
+    public void setCallbackGettingFileList(CallbackGettingFileList callback) {
+        channel.pipeline().get(IncomingHandler.class).setCallbackGetFileList(callback);
     }
 }

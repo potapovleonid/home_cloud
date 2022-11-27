@@ -2,7 +2,7 @@ package com.example.server;
 
 import com.example.server.network.AuthorizeHandler;
 import com.example.server.network.SQLConnection;
-import com.example.server.network.SaveFileHandler;
+import com.example.server.network.IncomingHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -31,7 +31,7 @@ public class ServerApp {
                         @Override
                         protected void initChannel(SocketChannel sh) {
                             sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger()));
-                            sh.pipeline().addLast(new SaveFileHandler("server_files", LoggerApp.getLogger()));
+                            sh.pipeline().addLast(new IncomingHandler("server_files", LoggerApp.getLogger()));
                             LoggerApp.info("Client connection");
                         }
                     });

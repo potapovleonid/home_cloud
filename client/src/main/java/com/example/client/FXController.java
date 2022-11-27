@@ -1,5 +1,6 @@
 package com.example.client;
 
+import com.example.client.fx.Controller;
 import com.example.client.network.Network;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -29,11 +30,17 @@ public class FXController extends Application {
         Network.getNetwork().setCallbackAuthenticated(resultAuth -> {
             if (resultAuth) {
                 LoggerApp.info("Auth success, delete auth pipeline");
-                this.stage.setScene(mainScene);
-                this.stage.setTitle("Home cloud");
+//                this.stage.setScene(mainScene);
+//                this.stage.setTitle("Home cloud");
             } else {
                 LoggerApp.info("Please try authenticate again");
             }
+        });
+
+        FXMLLoader mainLoader = new FXMLLoader(ClientApp.class.getResource("main.fxml"));
+        Network.getNetwork().setCallbackGettingFileList(files -> {
+            Controller controller = mainLoader.getController();
+            controller.updateServerFileList(files);
         });
 
         stage.show();

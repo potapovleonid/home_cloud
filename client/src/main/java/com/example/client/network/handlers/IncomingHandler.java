@@ -1,12 +1,12 @@
-package com.example.server.network;
+package com.example.client.network.handlers;
 
+import com.example.client.callbacks.CallbackGettingFileList;
+import com.example.client.network.ResponseStatusComplete;
 import com.example.common.FileInfo;
 import com.example.common.constants.HandlerState;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
-import com.example.common.network.FileSender;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
@@ -16,12 +16,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
 
-public class SaveFileHandler extends ChannelInboundHandlerAdapter {
+public class IncomingHandler extends ChannelInboundHandlerAdapter {
     private HandlerState handlerState = HandlerState.IDLE;
 
     private int listLength;
     private int filenameLength;
-    private String filename;
     private long fileLength;
     private long receivedFileLength;
     private BufferedOutputStream out;
@@ -29,7 +28,9 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     private String pathSaveFiles;
     private final Logger logger;
 
-    public SaveFileHandler(String pathSaveFiles, Logger logger) {
+    private CallbackGettingFileList callbackGettingFileList;
+
+    public IncomingHandler(String pathSaveFiles, Logger logger) {
         Path saveDirectory = Paths.get(pathSaveFiles);
         this.pathSaveFiles = pathSaveFiles;
         this.logger = logger;
@@ -44,10 +45,6 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (setUserLoginIfMsgIsLogin(msg)) {
-            return;
-        }
-
         ByteBuf buf = (ByteBuf) msg;
         while (buf.readableBytes() > 0) {
             switch (handlerState) {
@@ -62,24 +59,15 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
                     break;
                 case NAME_LENGTH:
                     readingFilenameLength(buf);
-                    swapHandlerState(HandlerState.NAME, "Length name: " + filenameLength + " bytes");
                     break;
                 case NAME:
                     readingFilename(buf);
-                    checkExistFileAndCreateOutput();
-                    swapHandlerState(HandlerState.FILE_LENGTH, "Filename: " + filename);
                     break;
                 case FILE_LENGTH:
                     readingFileLength(buf);
                     break;
                 case FILE:
                     writingFile(buf, ctx);
-                    break;
-                case REQUEST_NAME_LENGTH:
-                    readRequestFilenameLength(buf);
-                    break;
-                case REQUEST_NAME:
-                    readingRequestFilenameAndSendFile(buf, ctx);
                     break;
             }
         }
@@ -88,41 +76,27 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private boolean setUserLoginIfMsgIsLogin(Object msg) {
-        if (msg instanceof String) {
-            String userLogin = (String) msg;
-            pathSaveFiles += FileSystems.getDefault().getSeparator() + userLogin;
-            return true;
-        }
-        return false;
-    }
-
     private void checkingSignalByte(ByteBuf buf) {
         byte checkState = buf.readByte();
         if (checkState == SignalBytes.SENDING_FILE.getSignalByte()) {
             receivedFileLength = 0L;
-            swapHandlerState(HandlerState.NAME_LENGTH, "File state is user send file");
-        }
-        if (checkState == SignalBytes.REQUEST_FILE.getSignalByte()) {
-            swapHandlerState(HandlerState.REQUEST_NAME_LENGTH, "Request file");
+            handlerState = HandlerState.NAME_LENGTH;
+            logger.info("File state is user send file");
         }
         if (checkState == SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte()) {
             logger.info("File sending success");
         }
         if (checkState == SignalBytes.SENDING_LIST.getSignalByte()) {
-            swapHandlerState(HandlerState.LIST_LENGTH, "Send file list");
+            handlerState = HandlerState.LIST_LENGTH;
+            logger.info("Send file list");
         }
-    }
-
-    private void swapHandlerState(HandlerState state, String loggerMsg) {
-        handlerState = state;
-        logger.info(loggerMsg);
     }
 
     private void readingFileListLength(ByteBuf buf) {
         if (buf.readableBytes() >= LengthBytesDataTypes.INT.getLength()) {
             listLength = buf.readInt();
-            swapHandlerState(HandlerState.LIST, "Length list: " + listLength + " bytes");
+            handlerState = HandlerState.LIST;
+            logger.info("Length list: " + listLength + " bytes");
         }
     }
 
@@ -141,32 +115,33 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
             logger.info(String.format("Files list length %d", filesList.toArray().length));
 
             filesList.forEach(s -> System.out.println(s.toString()));
-            swapHandlerState(HandlerState.IDLE, "State: " + handlerState);
+            handlerState = HandlerState.IDLE;
+            logger.info("State: " + handlerState);
+
+            callbackGettingFileList.getFileList(filesList);
         }
     }
 
     private void readingFilenameLength(ByteBuf buf) {
         if (buf.readableBytes() >= LengthBytesDataTypes.INT.getLength()) {
             filenameLength = buf.readInt();
+            handlerState = HandlerState.NAME;
+            logger.info("Length name: " + filenameLength + " bytes");
         }
     }
 
-    private void readingFilename(ByteBuf buf) {
+    private void readingFilename(ByteBuf buf) throws FileNotFoundException {
         if (buf.readableBytes() >= filenameLength) {
             byte[] byteBufFilename = new byte[filenameLength];
             buf.readBytes(byteBufFilename);
-            filename = new String(byteBufFilename, StandardCharsets.UTF_8);
-        }
-    }
+            String filename = new String(byteBufFilename, StandardCharsets.UTF_8);
 
-    private void checkExistFileAndCreateOutput() {
-        checkExistsFilePathAndCreate();
+            checkExistsFilePathAndCreate();
 
-        try {
             out = new BufferedOutputStream(new FileOutputStream(pathSaveFiles +
                     FileSystems.getDefault().getSeparator() + filename));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            handlerState = HandlerState.FILE_LENGTH;
+            logger.info("Filename: " + filename);
         }
     }
 
@@ -183,7 +158,8 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     private void readingFileLength(ByteBuf buf) {
         if (buf.readableBytes() >= LengthBytesDataTypes.LONG.getLength()) {
             fileLength = buf.readLong();
-            swapHandlerState(HandlerState.FILE, "File length: " + fileLength);
+            logger.info("File length: " + fileLength);
+            handlerState = HandlerState.FILE;
         }
     }
 
@@ -192,7 +168,8 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
             out.write(buf.readByte());
             receivedFileLength++;
             if (receivedFileLength == fileLength) {
-                swapHandlerState(HandlerState.IDLE, "File received");
+                handlerState = HandlerState.IDLE;
+                logger.info("File received");
                 out.close();
                 successfullyReceivedFile(ctx);
                 break;
@@ -201,34 +178,11 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void successfullyReceivedFile(ChannelHandlerContext ctx) {
-        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
-        buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
-        ctx.writeAndFlush(buf);
-        ListSender.sendList(Paths.get(pathSaveFiles), ctx.channel(), logger);
+        ctx.writeAndFlush(new ResponseStatusComplete(true));
     }
 
-    private void readRequestFilenameLength(ByteBuf buf){
-        readingFilenameLength(buf);
-        swapHandlerState(HandlerState.REQUEST_NAME, "Filename length " + filenameLength);
-    }
-
-    private void readingRequestFilenameAndSendFile(ByteBuf buf, ChannelHandlerContext ctx){
-        readingFilename(buf);
-        sendRequestFile(ctx);
-        swapHandlerState(HandlerState.IDLE, "Request filename: " + filename);
-    }
-
-    private void sendRequestFile(ChannelHandlerContext ctx) {
-        try {
-            FileSender.sendFile(Paths.get(pathSaveFiles, FileSystems.getDefault().getSeparator(), filename),
-                    ctx.channel(),
-                    null,
-                    logger
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        swapHandlerState(HandlerState.IDLE, "Requested file sent");
+    public void setCallbackGetFileList(CallbackGettingFileList callback){
+        this.callbackGettingFileList = callback;
     }
 
     @Override
@@ -237,7 +191,7 @@ public class SaveFileHandler extends ChannelInboundHandlerAdapter {
             logger.info("Client disconnected");
             return;
         }
-        logger.warn(cause.getMessage());
+        cause.printStackTrace();
         ctx.close();
     }
 }

@@ -1,6 +1,6 @@
 package com.example.client.network.handlers;
 
-import com.example.client.CallbackAuthenticated;
+import com.example.client.callbacks.CallbackAuthenticated;
 import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

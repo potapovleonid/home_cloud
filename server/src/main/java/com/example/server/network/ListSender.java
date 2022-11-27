@@ -33,6 +33,7 @@ public class ListSender {
             buf = ByteBufAllocator.DEFAULT.directBuffer(listFilesLength);
             buf.writeBytes(bytesOfTheList);
             channel.writeAndFlush(buf);
+            logger.info("Server sent file list");
         } catch (IOException e) {
             logger.warn(e.getMessage());
         }

@@ -22,7 +22,6 @@ public class ClientApp {
             new Thread(() -> Network.getNetwork().start(countDownNetworkConnections)).start();
             countDownNetworkConnections.await();
             FXController.startFX();
-//            Network.getNetwork().getChannel().writeAndFlush(new RequestAuthorize("des", "des123"));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

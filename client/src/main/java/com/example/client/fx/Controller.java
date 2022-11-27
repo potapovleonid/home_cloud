@@ -2,6 +2,7 @@ package com.example.client.fx;
 
 import com.example.client.LoggerApp;
 import com.example.client.network.Network;
+import com.example.common.FileInfo;
 import com.example.common.network.FileSender;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -14,6 +15,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class Controller {
 
@@ -73,5 +75,10 @@ public class Controller {
             new Alert(Alert.AlertType.ERROR, "No one file isn't selected for download",
                     ButtonType.OK).showAndWait();
         }
+    }
+
+    public void updateServerFileList(List<FileInfo> list){
+        PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
+        tRightPanel.updateCloudList(list);
     }
 }
