@@ -4,12 +4,15 @@ import com.example.client.fx.Controller;
 import com.example.client.network.Network;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.JavaFXBuilderFactory;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class FXController extends Application {
 
-    private Scene mainScene;
     private Scene authScene;
 
     private Stage stage;
@@ -21,33 +24,46 @@ public class FXController extends Application {
         FXMLLoader loader = new FXMLLoader(ClientApp.class.getResource("authPanel.fxml"));
         authScene = new Scene(loader.load());
 
-        loader = new FXMLLoader(ClientApp.class.getResource("main.fxml"));
-        mainScene = new Scene(loader.load(), 1200, 800);
-
         this.stage.setTitle("Home cloud Authorizing");
         this.stage.setScene(authScene);
 
         Network.getNetwork().setCallbackAuthenticated(resultAuth -> {
             if (resultAuth) {
                 LoggerApp.info("Auth success, delete auth pipeline");
-//                this.stage.setScene(mainScene);
-//                this.stage.setTitle("Home cloud");
+                replaceSceneContent("main.fxml");
             } else {
                 LoggerApp.info("Please try authenticate again");
             }
         });
 
-        FXMLLoader mainLoader = new FXMLLoader(ClientApp.class.getResource("main.fxml"));
         Network.getNetwork().setCallbackGettingFileList(files -> {
-            Controller controller = mainLoader.getController();
+            Controller controller = new FXMLLoader(ClientApp.class.getResource("main.fxml")).getController();
             controller.updateServerFileList(files);
         });
 
         stage.show();
     }
 
-    public static void startFX(){
+    public void startFX(){
         launch();
+    }
+
+    public Parent replaceSceneContent(String fxmlName) throws Exception{
+        Parent page = FXMLLoader.load(FXController.class.getResource(fxmlName),
+                null, new JavaFXBuilderFactory());
+        Scene scene = stage.getScene();
+        if (scene == null){
+            scene = new Scene(page);
+            scene.getStylesheets().add(Objects.requireNonNull(
+                    FXController.class.getResource("demo.css")).toExternalForm());
+            stage.setScene(scene);
+        } else {
+            stage.getScene().setRoot(page);
+            stage.setTitle("Home cloud");
+        }
+        stage.sizeToScene();
+        stage.show();
+        return page;
     }
 
 

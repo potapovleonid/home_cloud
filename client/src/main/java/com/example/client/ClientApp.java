@@ -17,11 +17,13 @@ import java.util.concurrent.CountDownLatch;
 public class ClientApp {
 
     public static void main(String[] args) {
+        FXController fxController = new FXController();
         try {
             CountDownLatch countDownNetworkConnections = new CountDownLatch(1);
             new Thread(() -> Network.getNetwork().start(countDownNetworkConnections)).start();
             countDownNetworkConnections.await();
-            FXController.startFX();
+
+            fxController.startFX();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

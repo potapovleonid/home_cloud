@@ -4,6 +4,6 @@ import java.io.IOException;
 
 public interface CallbackAuthenticated {
 
-    void isAuthorize(boolean resultAuth) throws IOException;
+    void isAuthorize(boolean resultAuth) throws Exception;
 
 }
