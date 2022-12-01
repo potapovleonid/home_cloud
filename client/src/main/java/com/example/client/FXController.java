@@ -2,6 +2,7 @@ package com.example.client;
 
 import com.example.client.fx.Controller;
 import com.example.client.network.Network;
+import com.example.client.network.RequestList;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
@@ -31,6 +32,7 @@ public class FXController extends Application {
             if (resultAuth) {
                 LoggerApp.info("Auth success, delete auth pipeline");
                 replaceSceneContent("main.fxml");
+                Network.getNetwork().getChannel().writeAndFlush(new RequestList());
             } else {
                 LoggerApp.info("Please try authenticate again");
             }

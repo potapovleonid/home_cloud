@@ -1,9 +1,6 @@
 package com.example.client.network.handlers;
 
-import com.example.client.network.RequestAuthorize;
-import com.example.client.network.RequestFile;
-import com.example.client.network.ResponseOrRequest;
-import com.example.client.network.ResponseStatusComplete;
+import com.example.client.network.*;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
@@ -55,6 +52,11 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                     buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
                     ctx.writeAndFlush(buf);
                 }
+            }
+            if (obj instanceof RequestList){
+                ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
+                buf.writeByte(SignalBytes.REQUEST_LIST.getSignalByte());
+                ctx.writeAndFlush(buf);
             }
         }
     }
