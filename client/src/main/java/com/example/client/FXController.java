@@ -4,12 +4,14 @@ import com.example.client.fx.Controller;
 import com.example.client.network.Network;
 import com.example.client.network.RequestList;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class FXController extends Application {
@@ -46,28 +48,32 @@ public class FXController extends Application {
         stage.show();
     }
 
-    public void startFX(){
+    public void startFX() {
         launch();
     }
 
-    public Parent replaceSceneContent(String fxmlName) throws Exception{
-        Parent page = FXMLLoader.load(FXController.class.getResource(fxmlName),
-                null, new JavaFXBuilderFactory());
-        Scene scene = stage.getScene();
-        if (scene == null){
-            scene = new Scene(page);
-            scene.getStylesheets().add(Objects.requireNonNull(
-                    FXController.class.getResource("demo.css")).toExternalForm());
-            stage.setScene(scene);
-        } else {
-            stage.getScene().setRoot(page);
-            stage.setTitle("Home cloud");
-        }
-        stage.sizeToScene();
-        stage.show();
-        return page;
+    public void replaceSceneContent(String fxmlName) throws Exception {
+        Platform.runLater(() -> {
+            try {
+                Parent page = FXMLLoader.load(FXController.class.getResource(fxmlName),
+                        null, new JavaFXBuilderFactory());
+                Scene scene = stage.getScene();
+                if (scene == null) {
+                    scene = new Scene(page);
+                    scene.getStylesheets().add(Objects.requireNonNull(
+                            FXController.class.getResource("demo.css")).toExternalForm());
+                    stage.setScene(scene);
+                } else {
+                    stage.getScene().setRoot(page);
+                    stage.setTitle("Home cloud");
+                }
+                stage.sizeToScene();
+                stage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
-
 
 
 }
