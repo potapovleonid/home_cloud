@@ -3,12 +3,14 @@ package com.example.client;
 import com.example.client.fx.Controller;
 import com.example.client.network.Network;
 import com.example.client.network.RequestList;
+import com.example.client.network.handlers.AppControllers;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -34,14 +36,13 @@ public class FXController extends Application {
             if (resultAuth) {
                 LoggerApp.info("Auth success, delete auth pipeline");
                 replaceSceneContent("main.fxml");
-                Network.getNetwork().getChannel().writeAndFlush(new RequestList());
             } else {
                 LoggerApp.info("Please try authenticate again");
             }
         });
 
         Network.getNetwork().setCallbackGettingFileList(files -> {
-            Controller controller = new FXMLLoader(ClientApp.class.getResource("main.fxml")).getController();
+            Controller controller = AppControllers.getController();
             controller.updateServerFileList(files);
         });
 
@@ -72,6 +73,7 @@ public class FXController extends Application {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            Network.getNetwork().getChannel().writeAndFlush(new RequestList());
         });
     }
 

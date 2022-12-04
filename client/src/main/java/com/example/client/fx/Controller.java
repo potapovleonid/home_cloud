@@ -2,25 +2,34 @@ package com.example.client.fx;
 
 import com.example.client.LoggerApp;
 import com.example.client.network.Network;
+import com.example.client.network.handlers.AppControllers;
 import com.example.common.FileInfo;
 import com.example.common.network.FileSender;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class Controller {
+public class Controller implements Initializable {
 
     @FXML
     VBox leftPanel, rightPanel;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        AppControllers.setController(this);
+    }
 
     public void btnExitAction(ActionEvent actionEvent) {
         Platform.exit();
@@ -81,4 +90,5 @@ public class Controller {
         PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
         tRightPanel.updateCloudList(list);
     }
+
 }
