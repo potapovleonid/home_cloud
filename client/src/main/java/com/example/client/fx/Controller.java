@@ -2,6 +2,8 @@ package com.example.client.fx;
 
 import com.example.client.LoggerApp;
 import com.example.client.network.Network;
+import com.example.client.network.RequestFile;
+import com.example.client.network.RequestList;
 import com.example.client.network.handlers.AppControllers;
 import com.example.common.FileInfo;
 import com.example.common.network.FileSender;
@@ -46,17 +48,18 @@ public class Controller implements Initializable {
         }
 
         if (tLeftPanel.getSelectedFilename() != null){
-            sendFile(tLeftPanel);
+            sendFile(uploadFile);
         } else {
             new Alert(Alert.AlertType.ERROR, "No one file isn't selected for upload",
                     ButtonType.OK).showAndWait();
         }
     }
 
-    private void sendFile(PanelController tLeftPanel) {
+    private void sendFile(Path path) {
+//        TODO NOT WORKING
         try {
             FileSender.sendFile(
-                    tLeftPanel.getCurrentPath(),
+                    path,
                     Network.getNetwork().getChannel(),
                     finishListener -> {
                         if (!finishListener.isSuccess()){
@@ -69,6 +72,7 @@ public class Controller implements Initializable {
                         }
                     },
                     LoggerApp.getLogger());
+//            Network.getNetwork().getChannel().writeAndFlush(new RequestList());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,10 +80,11 @@ public class Controller implements Initializable {
 
     public void btnDownloadAction(ActionEvent actionEvent){
         PanelController tLeftPanel = (PanelController) leftPanel.getProperties().get("ctrl");
-        PanelController tRightPanel = (PanelController) rightPanel.getProperties().get("ctrl");
+        PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
 
         if (tRightPanel.getSelectedFilename() != null){
-//            TODO download
+            LoggerApp.info("Send request on download file: " + tRightPanel.getSelectedFilename());
+            Network.getNetwork().getChannel().writeAndFlush(new RequestFile(tRightPanel.getSelectedFilename()));
         } else {
             new Alert(Alert.AlertType.ERROR, "No one file isn't selected for download",
                     ButtonType.OK).showAndWait();

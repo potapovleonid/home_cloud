@@ -87,6 +87,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof String) {
             String userLogin = (String) msg;
             pathSaveFiles += FileSystems.getDefault().getSeparator() + userLogin;
+            logger.info("Set path save files: " + pathSaveFiles);
             return true;
         }
         return false;

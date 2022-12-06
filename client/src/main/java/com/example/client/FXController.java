@@ -36,6 +36,9 @@ public class FXController extends Application {
             if (resultAuth) {
                 LoggerApp.info("Auth success, delete auth pipeline");
                 replaceSceneContent("main.fxml");
+                Platform.runLater(() -> {
+                    Network.getNetwork().getChannel().writeAndFlush(new RequestList());
+                });
             } else {
                 LoggerApp.info("Please try authenticate again");
             }
@@ -56,7 +59,7 @@ public class FXController extends Application {
     public void replaceSceneContent(String fxmlName) throws Exception {
         Platform.runLater(() -> {
             try {
-                Parent page = FXMLLoader.load(FXController.class.getResource(fxmlName),
+                Parent page = FXMLLoader.load(Objects.requireNonNull(FXController.class.getResource(fxmlName)),
                         null, new JavaFXBuilderFactory());
                 Scene scene = stage.getScene();
                 if (scene == null) {
@@ -73,7 +76,6 @@ public class FXController extends Application {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Network.getNetwork().getChannel().writeAndFlush(new RequestList());
         });
     }
 
