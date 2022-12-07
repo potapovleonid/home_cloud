@@ -69,10 +69,10 @@ public class Controller implements Initializable {
                         if (finishListener.isSuccess()){
                             JOptionPane.showMessageDialog(null, "File's success downloaded");
                             LoggerApp.info("Send file is completed");
+                            Network.getNetwork().getChannel().writeAndFlush(new RequestList());
                         }
                     },
                     LoggerApp.getLogger());
-//            Network.getNetwork().getChannel().writeAndFlush(new RequestList());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -96,4 +96,7 @@ public class Controller implements Initializable {
         tRightPanel.updateCloudList(list);
     }
 
+    public void btnUpdateFileList(ActionEvent actionEvent) {
+        Network.getNetwork().getChannel().writeAndFlush(new RequestList());
+    }
 }

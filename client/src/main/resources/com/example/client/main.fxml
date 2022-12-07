@@ -21,6 +21,7 @@
     <fx:include fx:id="rightPanel" source="cloudPanel.fxml" HBox.hgrow="ALWAYS"/>
 </HBox>
     <HBox spacing="5">
+        <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Update file list" onAction="#btnUpdateFileList"/>
         <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Upload on server" onAction="#btnUploadAction"/>
         <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Download to computer" onAction="#btnDownloadAction"/>
         <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Exit" onAction="#btnExitAction"/>
