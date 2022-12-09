@@ -1,6 +1,7 @@
 package com.example.server.network;
 
 import com.example.common.constants.SignalBytes;
+import com.example.server.LoggerApp;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
+    private boolean resultAuth = false;
     private final Logger logger;
 
     public AuthorizeHandler(Logger logger) {
@@ -35,17 +37,16 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         String password = new String(passwordBytes, StandardCharsets.UTF_8);
 
-        boolean resultAuth = SQLConnection.authorizeUser(login, password);
+        resultAuth = SQLConnection.authorizeUser(login, password);
 
         logger.info(String.format("Result auth: %b", resultAuth));
 
         if(resultAuth){
             ctx.pipeline().remove(AuthorizeHandler.class);
+            ctx.pipeline().addFirst(new IncomingHandler("server_files", login, LoggerApp.getLogger()));
             sendResponse(ctx, resultAuth);
             logger.info(ctx.pipeline().toString());
         }
-
-        ctx.fireChannelRead(login);
     }
 
     private void sendResponse(ChannelHandlerContext ctx, boolean result){
