@@ -26,9 +26,9 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     private String pathSaveFiles;
     private final Logger logger;
 
-    public IncomingHandler(String pathSaveFiles, String userLogin, Logger logger) {
+    public IncomingHandler(String pathSaveFiles, Logger logger) {
         Path saveDirectory = Paths.get(pathSaveFiles);
-        this.pathSaveFiles = pathSaveFiles + FileSystems.getDefault().getSeparator() + userLogin;
+        this.pathSaveFiles = pathSaveFiles;
         this.logger = logger;
         if (!Files.exists(saveDirectory)) {
             try {
@@ -41,6 +41,10 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (checkAndSetUserLoginIfMsgIsLogin(msg)) {
+            return;
+        }
+
         ByteBuf buf = (ByteBuf) msg;
         while (buf.readableBytes() > 0) {
             switch (handlerState) {
@@ -77,6 +81,16 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     private void sendFileList(ChannelHandlerContext ctx) {
         ListSender.sendList(Paths.get(pathSaveFiles), ctx.channel(), logger);
+    }
+
+    private boolean checkAndSetUserLoginIfMsgIsLogin(Object msg) {
+        if (msg instanceof String) {
+            String userLogin = (String) msg;
+            pathSaveFiles += FileSystems.getDefault().getSeparator() + userLogin;
+            logger.info("Set path save files: " + pathSaveFiles);
+            return true;
+        }
+        return false;
     }
 
     private void checkingSignalByte(ByteBuf buf, ChannelHandlerContext ctx) {

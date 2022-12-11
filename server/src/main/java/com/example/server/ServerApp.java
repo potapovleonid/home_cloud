@@ -31,6 +31,7 @@ public class ServerApp {
                         @Override
                         protected void initChannel(SocketChannel sh) {
                             sh.pipeline().addLast(new AuthorizeHandler(LoggerApp.getLogger()));
+                            sh.pipeline().addLast(new IncomingHandler("server_files", LoggerApp.getLogger()));
                             LoggerApp.info("Client connection");
                         }
                     });
