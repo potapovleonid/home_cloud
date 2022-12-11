@@ -34,7 +34,7 @@ public class FXController extends Application {
 
         Network.getNetwork().setCallbackAuthenticated(resultAuth -> {
             if (resultAuth) {
-                LoggerApp.info("Auth success, delete auth pipeline");
+                LoggerApp.info("Auth success");
                 replaceSceneContent("main.fxml");
                 Platform.runLater(() -> {
                     Network.getNetwork().getChannel().writeAndFlush(new RequestList());

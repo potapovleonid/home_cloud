@@ -20,7 +20,12 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg){
+        if(resultAuth){
+            ctx.fireChannelRead(msg);
+            return;
+        }
+
         ByteBuf buf = (ByteBuf) msg;
 
         int lengthLogin = buf.readInt();
@@ -42,10 +47,8 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         logger.info(String.format("Result auth: %b", resultAuth));
 
         if(resultAuth){
-            ctx.pipeline().remove(AuthorizeHandler.class);
-            ctx.pipeline().addFirst(new IncomingHandler("server_files", login, LoggerApp.getLogger()));
             sendResponse(ctx, resultAuth);
-            logger.info(ctx.pipeline().toString());
+            ctx.fireChannelRead(login);
         }
     }
 
