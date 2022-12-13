@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
@@ -42,12 +43,12 @@ public class Controller implements Initializable {
 
         Path uploadFile = tLeftPanel.getCurrentPath().resolve(tLeftPanel.getSelectedFilename());
 
-        if (Files.isDirectory(uploadFile)){
+        if (Files.isDirectory(uploadFile)) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Select file is directory", ButtonType.OK);
             alert.showAndWait();
         }
 
-        if (tLeftPanel.getSelectedFilename() != null){
+        if (tLeftPanel.getSelectedFilename() != null) {
             sendFile(uploadFile);
         } else {
             new Alert(Alert.AlertType.ERROR, "No one file isn't selected for upload",
@@ -57,32 +58,37 @@ public class Controller implements Initializable {
 
     private void sendFile(Path path) {
 //        TODO NOT WORKING
-        try {
-            FileSender.sendFile(
-                    path,
-                    Network.getNetwork().getChannel(),
-                    finishListener -> {
-                        if (!finishListener.isSuccess()){
-                            JOptionPane.showMessageDialog(null, "File's fail downloaded");
-                            LoggerApp.info(finishListener.cause().getMessage());
-                        }
-                        if (finishListener.isSuccess()){
-                            JOptionPane.showMessageDialog(null, "File's success downloaded");
-                            LoggerApp.info("Send file is completed");
-                            Network.getNetwork().getChannel().writeAndFlush(new RequestList());
-                        }
-                    },
-                    LoggerApp.getLogger());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        Platform.runLater(() -> {
+            try {
+                FileSender.sendFile(
+                        path,
+                        Network.getNetwork().getChannel(),
+                        finishListener -> {
+                            if (!finishListener.isSuccess()) {
+                                JOptionPane.showMessageDialog(null, "File's fail downloaded");
+                                LoggerApp.info(finishListener.cause().getMessage());
+                            }
+                            if (finishListener.isSuccess()) {
+                                JOptionPane.showMessageDialog(null, "File's success downloaded");
+                                LoggerApp.info("Send file is completed");
+                                Network.getNetwork().getChannel().writeAndFlush(new RequestList());
+                            }
+                        },
+                        LoggerApp.getLogger());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+
     }
 
-    public void btnDownloadAction(ActionEvent actionEvent){
+    public void btnDownloadAction(ActionEvent actionEvent) {
         PanelController tLeftPanel = (PanelController) leftPanel.getProperties().get("ctrl");
         PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
 
-        if (tRightPanel.getSelectedFilename() != null){
+        if (tRightPanel.getSelectedFilename() != null) {
             LoggerApp.info("Send request on download file: " + tRightPanel.getSelectedFilename());
             Network.getNetwork().getChannel().writeAndFlush(new RequestFile(tRightPanel.getSelectedFilename()));
         } else {
@@ -91,7 +97,7 @@ public class Controller implements Initializable {
         }
     }
 
-    public void updateServerFileList(List<FileInfo> list){
+    public void updateServerFileList(List<FileInfo> list) {
         PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
         tRightPanel.updateCloudList(list);
     }

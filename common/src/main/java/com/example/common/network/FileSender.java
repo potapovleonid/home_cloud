@@ -17,6 +17,7 @@ public class FileSender {
     public static void sendFile(Path path, Channel channel, ChannelFutureListener completeListener,
                                 Logger logger) throws IOException {
 
+        logger.info(path.toAbsolutePath() + " sending");
         FileRegion region = new DefaultFileRegion(path.toFile(), 0, Files.size(path));
 
         byte[] filenameBytes = path.getFileName().toString().getBytes(StandardCharsets.UTF_8);
@@ -25,6 +26,8 @@ public class FileSender {
 
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
                 LengthBytesDataTypes.INT.getLength() + filenameLength + LengthBytesDataTypes.LONG.getLength());
+
+        logger.info(channel.config().getOptions());
 
         buf.writeByte(SignalBytes.SENDING_FILE.getSignalByte());
         buf.writeInt(filenameLength);
