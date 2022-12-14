@@ -1,6 +1,6 @@
-package com.example.client.network;
+package com.example.client.network.networking;
 
-public class RequestFile extends ResponseOrRequest{
+public class RequestFile implements Networking {
 
     private final String fileName;
 

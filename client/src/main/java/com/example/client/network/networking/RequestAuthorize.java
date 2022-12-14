@@ -1,6 +1,6 @@
-package com.example.client.network;
+package com.example.client.network.networking;
 
-public class RequestAuthorize extends ResponseOrRequest{
+public class RequestAuthorize implements Networking {
 
     private String login;
     private String password;

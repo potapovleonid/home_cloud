@@ -2,8 +2,8 @@ package com.example.client.fx;
 
 import com.example.client.LoggerApp;
 import com.example.client.network.Network;
-import com.example.client.network.RequestFile;
-import com.example.client.network.RequestList;
+import com.example.client.network.networking.RequestFile;
+import com.example.client.network.networking.RequestList;
 import com.example.client.network.handlers.AppControllers;
 import com.example.common.FileInfo;
 import com.example.common.network.FileSender;
@@ -11,7 +11,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
@@ -57,35 +56,30 @@ public class Controller implements Initializable {
     }
 
     private void sendFile(Path path) {
-//        TODO NOT WORKING
+//        TODO NOT WORKING CHECK OUTBOUND HANDLER
 
-        Platform.runLater(() -> {
-            try {
-                FileSender.sendFile(
-                        path,
-                        Network.getNetwork().getChannel(),
-                        finishListener -> {
-                            if (!finishListener.isSuccess()) {
-                                JOptionPane.showMessageDialog(null, "File's fail downloaded");
-                                LoggerApp.info(finishListener.cause().getMessage());
-                            }
-                            if (finishListener.isSuccess()) {
-                                JOptionPane.showMessageDialog(null, "File's success downloaded");
-                                LoggerApp.info("Send file is completed");
-                                Network.getNetwork().getChannel().writeAndFlush(new RequestList());
-                            }
-                        },
-                        LoggerApp.getLogger());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-
+        try {
+            FileSender.sendFile(
+                    path,
+                    Network.getNetwork().getChannel(),
+                    finishListener -> {
+                        if (!finishListener.isSuccess()) {
+                            JOptionPane.showMessageDialog(null, "File's fail downloaded");
+                            LoggerApp.info(finishListener.cause().getMessage());
+                        }
+                        if (finishListener.isSuccess()) {
+                            JOptionPane.showMessageDialog(null, "File's success downloaded");
+                            LoggerApp.info("Send file is completed");
+                            Network.getNetwork().getChannel().writeAndFlush(new RequestList());
+                        }
+                    },
+                    LoggerApp.getLogger());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void btnDownloadAction(ActionEvent actionEvent) {
-        PanelController tLeftPanel = (PanelController) leftPanel.getProperties().get("ctrl");
         PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
 
         if (tRightPanel.getSelectedFilename() != null) {

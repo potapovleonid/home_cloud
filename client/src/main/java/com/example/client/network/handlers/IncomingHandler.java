@@ -1,7 +1,7 @@
 package com.example.client.network.handlers;
 
 import com.example.client.callbacks.CallbackGettingFileList;
-import com.example.client.network.ResponseStatusComplete;
+import com.example.client.network.networking.ResponseStatusComplete;
 import com.example.common.FileInfo;
 import com.example.common.constants.HandlerState;
 import com.example.common.constants.LengthBytesDataTypes;

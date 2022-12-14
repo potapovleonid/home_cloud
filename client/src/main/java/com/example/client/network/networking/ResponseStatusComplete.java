@@ -1,6 +1,6 @@
-package com.example.client.network;
+package com.example.client.network.networking;
 
-public class ResponseStatusComplete extends ResponseOrRequest {
+public class ResponseStatusComplete implements Networking {
 
     private final boolean status;
 

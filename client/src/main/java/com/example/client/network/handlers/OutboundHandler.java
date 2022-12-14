@@ -1,6 +1,6 @@
 package com.example.client.network.handlers;
 
-import com.example.client.network.*;
+import com.example.client.network.networking.*;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
@@ -15,7 +15,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object obj, ChannelPromise promise) throws Exception {
-        if (obj instanceof ResponseOrRequest) {
+        if (obj instanceof Networking) {
             if (obj instanceof RequestAuthorize){
                 RequestAuthorize req = (RequestAuthorize) obj;
                 int lengthLogin = req.getLogin().getBytes().length;
@@ -58,6 +58,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 buf.writeByte(SignalBytes.REQUEST_LIST.getSignalByte());
                 ctx.writeAndFlush(buf);
             }
+
         }
     }
 

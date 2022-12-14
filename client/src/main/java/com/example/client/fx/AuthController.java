@@ -1,7 +1,7 @@
 package com.example.client.fx;
 
 import com.example.client.network.Network;
-import com.example.client.network.RequestAuthorize;
+import com.example.client.network.networking.RequestAuthorize;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;

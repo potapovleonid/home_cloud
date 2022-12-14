@@ -2,7 +2,7 @@ package com.example.client;
 
 import com.example.client.fx.Controller;
 import com.example.client.network.Network;
-import com.example.client.network.RequestList;
+import com.example.client.network.networking.RequestList;
 import com.example.client.network.handlers.AppControllers;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -10,7 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
