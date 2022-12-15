@@ -5,6 +5,7 @@ import com.example.client.network.Network;
 import com.example.client.network.networking.RequestFile;
 import com.example.client.network.networking.RequestList;
 import com.example.client.network.handlers.AppControllers;
+import com.example.client.network.networking.SendFile;
 import com.example.common.FileInfo;
 import com.example.common.network.FileSender;
 import javafx.application.Platform;
@@ -58,25 +59,22 @@ public class Controller implements Initializable {
     private void sendFile(Path path) {
 //        TODO NOT WORKING CHECK OUTBOUND HANDLER
 
-        try {
-            FileSender.sendFile(
-                    path,
-                    Network.getNetwork().getChannel(),
-                    finishListener -> {
-                        if (!finishListener.isSuccess()) {
-                            JOptionPane.showMessageDialog(null, "File's fail downloaded");
-                            LoggerApp.info(finishListener.cause().getMessage());
-                        }
-                        if (finishListener.isSuccess()) {
-                            JOptionPane.showMessageDialog(null, "File's success downloaded");
-                            LoggerApp.info("Send file is completed");
-                            Network.getNetwork().getChannel().writeAndFlush(new RequestList());
-                        }
-                    },
-                    LoggerApp.getLogger());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Network.getNetwork().getChannel().writeAndFlush(
+                new SendFile(
+                        path,
+                        Network.getNetwork().getChannel(),
+                        finishListener -> {
+                            if (!finishListener.isSuccess()) {
+                                JOptionPane.showMessageDialog(null, "File's fail downloaded");
+                                LoggerApp.info(finishListener.cause().getMessage());
+                            }
+                            if (finishListener.isSuccess()) {
+                                JOptionPane.showMessageDialog(null, "File's success downloaded");
+                                LoggerApp.info("Send file is completed");
+                                Network.getNetwork().getChannel().writeAndFlush(new RequestList());
+                            }
+                        },
+                        LoggerApp.getLogger()));
     }
 
     public void btnDownloadAction(ActionEvent actionEvent) {

@@ -58,7 +58,9 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 buf.writeByte(SignalBytes.REQUEST_LIST.getSignalByte());
                 ctx.writeAndFlush(buf);
             }
-
+            if (obj instanceof SendFile){
+//                ...
+            }
         }
     }
 
