@@ -7,7 +7,6 @@ import com.example.client.network.networking.RequestList;
 import com.example.client.network.handlers.AppControllers;
 import com.example.client.network.networking.SendFile;
 import com.example.common.FileInfo;
-import com.example.common.network.FileSender;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,7 +16,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 
 import javax.swing.*;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,20 +38,23 @@ public class Controller implements Initializable {
 
     public void btnUploadAction(ActionEvent actionEvent) {
         PanelController tLeftPanel = (PanelController) leftPanel.getProperties().get("ctrl");
+        Path uploadFile;
 
-        Path uploadFile = tLeftPanel.getCurrentPath().resolve(tLeftPanel.getSelectedFilename());
+        try {
+            uploadFile = tLeftPanel.getCurrentPath().resolve(tLeftPanel.getSelectedFilename());
+        } catch (NullPointerException e){
+            new Alert(Alert.AlertType.ERROR, "No one file isn't selected for upload",
+                    ButtonType.OK).showAndWait();
+            return;
+        }
 
         if (Files.isDirectory(uploadFile)) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Select file is directory", ButtonType.OK);
             alert.showAndWait();
+            return;
         }
 
-        if (tLeftPanel.getSelectedFilename() != null) {
-            sendFile(uploadFile);
-        } else {
-            new Alert(Alert.AlertType.ERROR, "No one file isn't selected for upload",
-                    ButtonType.OK).showAndWait();
-        }
+        sendFile(uploadFile);
     }
 
     private void sendFile(Path path) {

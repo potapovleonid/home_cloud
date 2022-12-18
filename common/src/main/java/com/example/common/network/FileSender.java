@@ -1,6 +1,5 @@
 package com.example.common.network;
 
-import com.example.common.CallbackDownload;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
@@ -24,8 +23,13 @@ public class FileSender {
         int filenameLength = filenameBytes.length;
         long fileLength = Files.size(path);
 
-        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
-                LengthBytesDataTypes.INT.getLength() + filenameLength + LengthBytesDataTypes.LONG.getLength());
+        int length =
+                LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
+                LengthBytesDataTypes.INT.getLength() +
+                filenameLength +
+                LengthBytesDataTypes.LONG.getLength();
+
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(length);
 
         logger.info(channel.config().getOptions());
 
