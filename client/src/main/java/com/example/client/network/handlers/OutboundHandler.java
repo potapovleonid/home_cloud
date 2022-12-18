@@ -3,11 +3,10 @@ package com.example.client.network.handlers;
 import com.example.client.network.networking.*;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
+import com.example.common.network.FileSender;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 
 import java.nio.charset.StandardCharsets;
 
@@ -30,6 +29,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 buf.writeBytes(bytesPassword);
 
                 ctx.writeAndFlush(buf);
+                return;
             }
             if (obj instanceof RequestFile) {
                 RequestFile req = (RequestFile) obj;
@@ -44,6 +44,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 buf.writeBytes(fileNameBytes);
 
                 ctx.writeAndFlush(buf);
+                return;
             }
             if (obj instanceof ResponseStatusComplete) {
                 ResponseStatusComplete resp = (ResponseStatusComplete) obj;
@@ -52,16 +53,25 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                     buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
                     ctx.writeAndFlush(buf);
                 }
+                return;
             }
             if (obj instanceof RequestList){
                 ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
                 buf.writeByte(SignalBytes.REQUEST_LIST.getSignalByte());
                 ctx.writeAndFlush(buf);
+                return;
             }
             if (obj instanceof SendFile){
-//                ...
+                SendFile file = (SendFile) obj;
+                FileSender.sendFile(
+                        file.getFilePath(),
+                        file.getChannel(),
+                        file.getChannelFutureListener(),
+                        file.getLogger()
+                        );
+                return;
             }
+            throw new IllegalArgumentException("Unknown outbound command");
         }
     }
-
 }
