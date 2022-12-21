@@ -9,23 +9,17 @@ import java.nio.file.Path;
 public class SendFile implements Networking {
 
     private final Path filePath;
-    private final Channel channel;
     private final ChannelFutureListener channelFutureListener;
     private final Logger logger;
 
-    public SendFile(Path filePath, Channel channel, ChannelFutureListener channelFutureListener, Logger logger) {
+    public SendFile(Path filePath, ChannelFutureListener channelFutureListener, Logger logger) {
         this.filePath = filePath;
-        this.channel = channel;
         this.channelFutureListener = channelFutureListener;
         this.logger = logger;
     }
 
     public Path getFilePath() {
         return filePath;
-    }
-
-    public Channel getChannel() {
-        return channel;
     }
 
     public ChannelFutureListener getChannelFutureListener() {
