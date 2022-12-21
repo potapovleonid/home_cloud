@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FileSender {
-    public static void sendFile(Path path, Channel channel, ChannelFutureListener completeListener,
+    public static void sendFile(Path path, ChannelHandlerContext channel, ChannelFutureListener completeListener,
                                 Logger logger) throws IOException {
 
         logger.info(path.toAbsolutePath() + " sending");
@@ -30,8 +30,6 @@ public class FileSender {
                 LengthBytesDataTypes.LONG.getLength();
 
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(length);
-
-        logger.info(channel.config().getOptions());
 
         buf.writeByte(SignalBytes.SENDING_FILE.getSignalByte());
         buf.writeInt(filenameLength);
