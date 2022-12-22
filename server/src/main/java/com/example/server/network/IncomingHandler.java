@@ -190,8 +190,9 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     private void sendRequestFile(ChannelHandlerContext ctx) {
         try {
-            FileSender.sendFile(Paths.get(pathSaveFiles, FileSystems.getDefault().getSeparator(), filename),
-                    ctx.channel(),
+            FileSender.sendFile(
+                    Paths.get(pathSaveFiles, FileSystems.getDefault().getSeparator(), filename),
+                    ctx,
                     null,
                     logger
             );

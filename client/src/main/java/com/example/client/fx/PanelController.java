@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -105,12 +104,6 @@ public class PanelController implements Initializable {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Failed to update list of files", ButtonType.OK);
             alert.showAndWait();
         }
-    }
-
-    public void updateCloudList(List<FileInfo> list) {
-        filesTable.getItems().clear();
-        filesTable.getItems().addAll(list);
-        filesTable.sort();
     }
 
     public void btnPathUp(ActionEvent actionEvent) {

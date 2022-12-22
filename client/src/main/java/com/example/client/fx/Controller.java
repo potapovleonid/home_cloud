@@ -58,12 +58,9 @@ public class Controller implements Initializable {
     }
 
     private void sendFile(Path path) {
-//        TODO NOT WORKING CHECK OUTBOUND HANDLER
-
         Network.getNetwork().getChannel().writeAndFlush(
                 new SendFile(
                         path,
-                        Network.getNetwork().getChannel(),
                         finishListener -> {
                             if (!finishListener.isSuccess()) {
                                 JOptionPane.showMessageDialog(null, "File's fail downloaded");
@@ -91,6 +88,7 @@ public class Controller implements Initializable {
     }
 
     public void updateServerFileList(List<FileInfo> list) {
+//        TODO ADD ALERT SUCCESS UPLOAD
         PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
         tRightPanel.updateCloudList(list);
     }
