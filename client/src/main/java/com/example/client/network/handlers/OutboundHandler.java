@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class OutboundHandler extends ChannelOutboundHandlerAdapter {
@@ -17,61 +18,81 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
         if (obj instanceof Networking) {
             if (obj instanceof RequestAuthorize){
                 RequestAuthorize req = (RequestAuthorize) obj;
-                int lengthLogin = req.getLogin().getBytes().length;
-                byte[] bytesLogin = req.getLogin().getBytes();
-                int lengthPassword = req.getPassword().getBytes().length;
-                byte[] bytesPassword = req.getPassword().getBytes();
-
-                ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(4 + lengthLogin + 4 + lengthPassword);
-                buf.writeInt(lengthLogin);
-                buf.writeBytes(bytesLogin);
-                buf.writeInt(lengthPassword);
-                buf.writeBytes(bytesPassword);
-
-                ctx.writeAndFlush(buf);
+                sendRequestAuthorize(ctx, req);
                 return;
             }
             if (obj instanceof RequestFile) {
                 RequestFile req = (RequestFile) obj;
-                String filename = req.getFileName();
-                byte[] fileNameBytes = filename.getBytes(StandardCharsets.UTF_8);
-                int lengthFilename = fileNameBytes.length;
-                ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
-                        LengthBytesDataTypes.INT.getLength() + lengthFilename);
-
-                buf.writeByte(SignalBytes.REQUEST_FILE.getSignalByte());
-                buf.writeInt(lengthFilename);
-                buf.writeBytes(fileNameBytes);
-
-                ctx.writeAndFlush(buf);
+                sendRequestFile(ctx, req);
                 return;
             }
             if (obj instanceof ResponseStatusComplete) {
                 ResponseStatusComplete resp = (ResponseStatusComplete) obj;
-                if (resp.isStatus()) {
-                    ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
-                    buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
-                    ctx.writeAndFlush(buf);
-                }
+                sendResponseGetStatus(ctx, resp);
                 return;
             }
             if (obj instanceof RequestList){
-                ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
-                buf.writeByte(SignalBytes.REQUEST_LIST.getSignalByte());
-                ctx.writeAndFlush(buf);
+                sendRequestList(ctx);
                 return;
             }
             if (obj instanceof SendFile){
                 SendFile file = (SendFile) obj;
-                FileSender.sendFile(
-                        file.getFilePath(),
-                        file.getChannel(),
-                        file.getChannelFutureListener(),
-                        file.getLogger()
-                        );
+                sendFile(ctx, file);
                 return;
             }
             throw new IllegalArgumentException("Unknown outbound command");
         }
+    }
+
+    private void sendRequestAuthorize(ChannelHandlerContext ctx, RequestAuthorize req) {
+        int lengthLogin = req.getLogin().getBytes().length;
+        byte[] bytesLogin = req.getLogin().getBytes();
+        int lengthPassword = req.getPassword().getBytes().length;
+        byte[] bytesPassword = req.getPassword().getBytes();
+
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(4 + lengthLogin + 4 + lengthPassword);
+        buf.writeInt(lengthLogin);
+        buf.writeBytes(bytesLogin);
+        buf.writeInt(lengthPassword);
+        buf.writeBytes(bytesPassword);
+
+        ctx.writeAndFlush(buf);
+    }
+
+    private void sendRequestFile(ChannelHandlerContext ctx, RequestFile req) {
+        String filename = req.getFileName();
+        byte[] fileNameBytes = filename.getBytes(StandardCharsets.UTF_8);
+        int lengthFilename = fileNameBytes.length;
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
+                LengthBytesDataTypes.INT.getLength() + lengthFilename);
+
+        buf.writeByte(SignalBytes.REQUEST_FILE.getSignalByte());
+        buf.writeInt(lengthFilename);
+        buf.writeBytes(fileNameBytes);
+
+        ctx.writeAndFlush(buf);
+    }
+
+    private void sendResponseGetStatus(ChannelHandlerContext ctx, ResponseStatusComplete resp) {
+        if (resp.isStatus()) {
+            ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
+            buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
+            ctx.writeAndFlush(buf);
+        }
+    }
+
+    private void sendRequestList(ChannelHandlerContext ctx) {
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
+        buf.writeByte(SignalBytes.REQUEST_LIST.getSignalByte());
+        ctx.writeAndFlush(buf);
+    }
+
+    private void sendFile(ChannelHandlerContext ctx, SendFile file) throws IOException {
+        FileSender.sendFile(
+                file.getFilePath(),
+                ctx,
+                file.getChannelFutureListener(),
+                file.getLogger()
+                );
     }
 }
