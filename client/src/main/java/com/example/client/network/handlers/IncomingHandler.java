@@ -11,6 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -170,6 +171,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             if (receivedFileLength == fileLength) {
                 handlerState = HandlerState.IDLE;
                 logger.info("File received");
+                JOptionPane.showMessageDialog(null, "File's success downloaded");
                 out.close();
                 successfullyReceivedFile(ctx);
                 break;

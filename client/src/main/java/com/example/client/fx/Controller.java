@@ -63,11 +63,11 @@ public class Controller implements Initializable {
                         path,
                         finishListener -> {
                             if (!finishListener.isSuccess()) {
-                                JOptionPane.showMessageDialog(null, "File's fail downloaded");
+                                JOptionPane.showMessageDialog(null, "File's fail uploaded");
                                 LoggerApp.info(finishListener.cause().getMessage());
                             }
                             if (finishListener.isSuccess()) {
-                                JOptionPane.showMessageDialog(null, "File's success downloaded");
+                                JOptionPane.showMessageDialog(null, "File's success uploaded");
                                 LoggerApp.info("Send file is completed");
                                 Network.getNetwork().getChannel().writeAndFlush(new RequestList());
                             }
@@ -88,7 +88,6 @@ public class Controller implements Initializable {
     }
 
     public void updateServerFileList(List<FileInfo> list) {
-//        TODO ADD ALERT SUCCESS UPLOAD
         PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
         tRightPanel.updateCloudList(list);
     }

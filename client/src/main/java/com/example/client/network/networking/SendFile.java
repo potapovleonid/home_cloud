@@ -1,6 +1,5 @@
 package com.example.client.network.networking;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import org.apache.log4j.Logger;
 
