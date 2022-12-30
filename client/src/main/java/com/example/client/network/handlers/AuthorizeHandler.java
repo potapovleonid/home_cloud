@@ -5,6 +5,8 @@ import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.apache.log4j.Logger;
 
 public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
@@ -33,6 +35,18 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         if (checkResponse == SignalBytes.FAILED_AUTH.getSignalByte()){
             logger.info("Get signal byte " + SignalBytes.FAILED_AUTH.getSignalByte() + " - Authorize is fail");
             callbackAuthenticated.isAuthorize(false);
+        }
+        if (checkResponse == SignalBytes.SUCCESS_REGISTER.getSignalByte()){
+            logger.info("Get signal byte " + SignalBytes.SUCCESS_REGISTER.getSignalByte() + " - Register new user is success");
+            new Alert(Alert.AlertType.INFORMATION, "New user successfully created", ButtonType.OK);
+        }
+        if (checkResponse == SignalBytes.FAILED_REGISTER.getSignalByte()){
+            logger.info("Get signal byte " + SignalBytes.FAILED_REGISTER.getSignalByte() + " - Register new user is fail");
+            new Alert(Alert.AlertType.WARNING, "New user fail create", ButtonType.OK);
+        }
+        if (checkResponse == SignalBytes.FAILED_REGISTER_EXIST_USER.getSignalByte()){
+            logger.info("Get signal byte " + SignalBytes.FAILED_REGISTER_EXIST_USER.getSignalByte() + " - Register new user is fail");
+            new Alert(Alert.AlertType.WARNING, "Username is already in use", ButtonType.OK);
         }
     }
 
