@@ -35,7 +35,7 @@
                         <Insets right="25.0" />
                      </HBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" text="Registration" />
+                  <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" text="Registration" onAction="#sendRegisterCredentials" />
             </HBox>
          </VBox>
    </children>

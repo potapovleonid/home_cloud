@@ -2,6 +2,7 @@ package com.example.client.fx;
 
 import com.example.client.network.Network;
 import com.example.client.network.networking.RequestAuthorize;
+import com.example.client.network.networking.RequestRegisterUser;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -23,5 +24,11 @@ public class AuthController {
         Network.getNetwork().getChannel().writeAndFlush(new RequestAuthorize(loginField.getText(), passwordField.getText()));
     }
 
+    public void sendRegisterCredentials(ActionEvent actionEvent) {
+        if (loginField.getText() == null || passwordField.getText() == null){
+            new Alert(Alert.AlertType.WARNING, "Someone field is empty, please try again", ButtonType.OK);
+        }
+        Network.getNetwork().getChannel().writeAndFlush(new RequestRegisterUser(loginField.getText(), passwordField.getText()));
+    }
 
 }
