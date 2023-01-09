@@ -6,6 +6,7 @@ public enum SignalBytes {
     REQUEST_LIST((byte) 115),
     REQUEST_FILE((byte) 105),
     REQUEST_REGISTER_NEW_USER((byte) 111),
+    REQUEST_AUTHORIZE((byte) 107),
     RECEIVED_SUCCESS_FILE((byte) 17),
     SUCCESS_AUTH((byte) 127),
     SUCCESS_REGISTER((byte) 126),

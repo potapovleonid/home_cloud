@@ -28,27 +28,31 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         ByteBuf buf = (ByteBuf) msg;
 
-        int lengthLogin = buf.readInt();
-        byte[] loginBytes = new byte[lengthLogin];
-        buf.readBytes(loginBytes);
+        byte signal = buf.readByte();
 
-        String login = new String(loginBytes, StandardCharsets.UTF_8);
+        if (signal == SignalBytes.REQUEST_AUTHORIZE.getSignalByte()) {
+            int lengthLogin = buf.readInt();
+            byte[] loginBytes = new byte[lengthLogin];
+            buf.readBytes(loginBytes);
 
-        logger.info(String.format("Login length %d, login: %s", lengthLogin, login));
+            String login = new String(loginBytes, StandardCharsets.UTF_8);
 
-        int lengthPassword = buf.readInt();
-        byte[] passwordBytes = new byte[lengthPassword];
-        buf.readBytes(passwordBytes);
+            logger.info(String.format("Login length %d, login: %s", lengthLogin, login));
 
-        String password = new String(passwordBytes, StandardCharsets.UTF_8);
+            int lengthPassword = buf.readInt();
+            byte[] passwordBytes = new byte[lengthPassword];
+            buf.readBytes(passwordBytes);
 
-        resultAuth = SQLConnection.authorizeUser(login, password);
+            String password = new String(passwordBytes, StandardCharsets.UTF_8);
 
-        logger.info(String.format("Result auth: %b", resultAuth));
+            resultAuth = SQLConnection.authorizeUser(login, password);
 
-        if(resultAuth){
-            sendResponse(ctx, resultAuth);
-            ctx.fireChannelRead(login);
+            logger.info(String.format("Result auth: %b", resultAuth));
+
+            if (resultAuth) {
+                sendResponse(ctx, resultAuth);
+                ctx.fireChannelRead(login);
+            }
         }
     }
 
