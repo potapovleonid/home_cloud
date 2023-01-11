@@ -9,9 +9,8 @@ public enum SignalBytes {
     REQUEST_AUTHORIZE((byte) 107),
     RECEIVED_SUCCESS_FILE((byte) 17),
     SUCCESS_AUTH((byte) 127),
-    SUCCESS_REGISTER((byte) 126),
-    FAILED_REGISTER((byte) -125),
-    FAILED_REGISTER_EXIST_USER((byte) -124),
+    SUCCESS_REGISTER_USER((byte) 126),
+    FAILED_REGISTER_USER((byte) -125),
     FAILED_AUTH((byte) -128);
 
     private final byte signalByte;

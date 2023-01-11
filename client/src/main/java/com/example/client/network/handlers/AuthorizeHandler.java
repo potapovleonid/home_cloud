@@ -36,16 +36,12 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
             logger.info("Get signal byte " + SignalBytes.FAILED_AUTH.getSignalByte() + " - Authorize is fail");
             callbackAuthenticated.isAuthorize(false);
         }
-        if (checkResponse == SignalBytes.SUCCESS_REGISTER.getSignalByte()){
-            logger.info("Get signal byte " + SignalBytes.SUCCESS_REGISTER.getSignalByte() + " - Register new user is success");
+        if (checkResponse == SignalBytes.SUCCESS_REGISTER_USER.getSignalByte()){
+            logger.info("Get signal byte " + SignalBytes.SUCCESS_REGISTER_USER.getSignalByte() + " - Register new user is success");
             new Alert(Alert.AlertType.INFORMATION, "New user successfully created", ButtonType.OK);
         }
-        if (checkResponse == SignalBytes.FAILED_REGISTER.getSignalByte()){
-            logger.info("Get signal byte " + SignalBytes.FAILED_REGISTER.getSignalByte() + " - Register new user is fail");
-            new Alert(Alert.AlertType.WARNING, "New user fail create", ButtonType.OK);
-        }
-        if (checkResponse == SignalBytes.FAILED_REGISTER_EXIST_USER.getSignalByte()){
-            logger.info("Get signal byte " + SignalBytes.FAILED_REGISTER_EXIST_USER.getSignalByte() + " - Register new user is fail");
+        if (checkResponse == SignalBytes.FAILED_REGISTER_USER.getSignalByte()){
+            logger.info("Get signal byte " + SignalBytes.FAILED_REGISTER_USER.getSignalByte() + " - Register new user is fail");
             new Alert(Alert.AlertType.WARNING, "Username is already in use", ButtonType.OK);
         }
     }
