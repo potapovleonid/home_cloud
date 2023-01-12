@@ -31,21 +31,11 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         if (signal == SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte()){
             logger.info("Get signal register new user");
-//            TODO ADD METHOD
-            int lengthLogin = buf.readInt();
-            byte[] loginBytes = new byte[lengthLogin];
-            buf.readBytes(loginBytes);
 
-            String login = new String(loginBytes, StandardCharsets.UTF_8);
+            String login = readLoginFromBuff(buf);
+            String password = readPasswordFromBuff(buf);
 
             logger.info(String.format("Get login: %s", login));
-
-            int lengthPassword = buf.readInt();
-            byte[] passwordBytes = new byte[lengthPassword];
-            buf.readBytes(passwordBytes);
-
-            String password = new String(passwordBytes, StandardCharsets.UTF_8);
-//            TODO ----
 
             boolean resultRegisterUser = SQLConnection.addUser(login, password);
 
@@ -55,19 +45,10 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         if (signal == SignalBytes.REQUEST_AUTHORIZE.getSignalByte()) {
             logger.info("Get signal authorize user");
 
-            int lengthLogin = buf.readInt();
-            byte[] loginBytes = new byte[lengthLogin];
-            buf.readBytes(loginBytes);
-
-            String login = new String(loginBytes, StandardCharsets.UTF_8);
+            String login = readLoginFromBuff(buf);
+            String password = readPasswordFromBuff(buf);
 
             logger.info(String.format("Get login: %s", login));
-
-            int lengthPassword = buf.readInt();
-            byte[] passwordBytes = new byte[lengthPassword];
-            buf.readBytes(passwordBytes);
-
-            String password = new String(passwordBytes, StandardCharsets.UTF_8);
 
             resultAuth = SQLConnection.authorizeUser(login, password);
 
@@ -80,8 +61,20 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-//    TODO readLogin
-//    TODO readPassword
+    private String readPasswordFromBuff(ByteBuf buf) {
+        int lengthPassword = buf.readInt();
+        byte[] passwordBytes = new byte[lengthPassword];
+        buf.readBytes(passwordBytes);
+
+        return new String(passwordBytes, StandardCharsets.UTF_8);
+    }
+
+    private String readLoginFromBuff(ByteBuf buf) {
+        int lengthLogin = buf.readInt();
+        byte[] loginBytes = new byte[lengthLogin];
+        buf.readBytes(loginBytes);
+        return new String(loginBytes, StandardCharsets.UTF_8);
+    }
 
     private void sendResponseResult(ChannelHandlerContext ctx, boolean result, SignalBytes signalTrue, SignalBytes signalFalse){
         ByteBuf byteBufResponse = getByteBufWithResponse(result, signalTrue, signalFalse);
