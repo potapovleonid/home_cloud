@@ -14,6 +14,9 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
     private boolean resultAuth = false;
     private final Logger logger;
 
+    private String login;
+    private String password;
+
     public AuthorizeHandler(Logger logger) {
         this.logger = logger;
     }
@@ -32,22 +35,20 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         if (signal == SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte()){
             logger.info("Get signal register new user");
 
-            String login = readLoginFromBuff(buf);
-            String password = readPasswordFromBuff(buf);
-
+            readAndSetLoginAndPassword(buf);
             logger.info(String.format("Get login: %s", login));
 
             boolean resultRegisterUser = SQLConnection.addUser(login, password);
 
             sendResponseResult(ctx, resultRegisterUser, SignalBytes.SUCCESS_REGISTER_USER, SignalBytes.FAILED_REGISTER_USER);
+
+            clearPasswordAndLogin();
         }
 
         if (signal == SignalBytes.REQUEST_AUTHORIZE.getSignalByte()) {
             logger.info("Get signal authorize user");
 
-            String login = readLoginFromBuff(buf);
-            String password = readPasswordFromBuff(buf);
-
+            readAndSetLoginAndPassword(buf);
             logger.info(String.format("Get login: %s", login));
 
             resultAuth = SQLConnection.authorizeUser(login, password);
@@ -58,7 +59,14 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
                 sendResponseResult(ctx, resultAuth, SignalBytes.SUCCESS_AUTH, SignalBytes.FAILED_AUTH);
                 ctx.fireChannelRead(login);
             }
+
+            clearPasswordAndLogin();
         }
+    }
+
+    private void readAndSetLoginAndPassword(ByteBuf buf) {
+        login = readLoginFromBuff(buf);
+        password = readPasswordFromBuff(buf);
     }
 
     private String readPasswordFromBuff(ByteBuf buf) {
@@ -91,5 +99,10 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
             byteBufResponse.writeByte(signalFalse.getSignalByte());
         }
         return byteBufResponse;
+    }
+
+    private void clearPasswordAndLogin() {
+        password = null;
+        login = null;
     }
 }
