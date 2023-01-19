@@ -45,10 +45,9 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
 
                 byte[] bytesLogin = req.getLogin().getBytes(StandardCharsets.UTF_8);
                 int lengthLogin = bytesLogin.length;
-                byte[] bytesPassword = req.getPassword().getBytes(StandardCharsets.UTF_8);
+                byte[] bytesPassword = req.getPassword();
                 int lengthPassword = bytesPassword.length;
 
-//                TODO hashcode password
                 ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
                         LengthBytesDataTypes.INT.getLength() + lengthLogin +
                         LengthBytesDataTypes.INT.getLength() + lengthPassword);
@@ -68,7 +67,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
     private void sendRequestAuthorize(ChannelHandlerContext ctx, RequestAuthorize req) {
         byte[] bytesLogin = req.getLogin().getBytes(StandardCharsets.UTF_8);
         int lengthLogin = bytesLogin.length;
-        byte[] bytesPassword = req.getPassword().getBytes(StandardCharsets.UTF_8);
+        byte[] bytesPassword = req.getPassword();
         int lengthPassword = bytesPassword.length;
 
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
