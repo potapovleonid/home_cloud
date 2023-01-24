@@ -21,6 +21,11 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 sendRequestAuthorize(ctx, req);
                 return;
             }
+            if (obj instanceof RequestRegisterUser) {
+                RequestRegisterUser req = (RequestRegisterUser) obj;
+                sendRequestNewUser(ctx, req);
+                return;
+            }
             if (obj instanceof RequestFile) {
                 RequestFile req = (RequestFile) obj;
                 sendRequestFile(ctx, req);
@@ -40,26 +45,6 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 sendFile(ctx, file);
                 return;
             }
-            if (obj instanceof RequestRegisterUser) {
-                RequestRegisterUser req = (RequestRegisterUser) obj;
-
-                byte[] bytesLogin = req.getLogin().getBytes(StandardCharsets.UTF_8);
-                int lengthLogin = bytesLogin.length;
-                byte[] bytesPassword = req.getPassword();
-                int lengthPassword = bytesPassword.length;
-
-                ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
-                        LengthBytesDataTypes.INT.getLength() + lengthLogin +
-                        LengthBytesDataTypes.INT.getLength() + lengthPassword);
-
-                buf.writeByte(SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte());
-                buf.writeInt(lengthLogin);
-                buf.writeBytes(bytesLogin);
-                buf.writeInt(lengthPassword);
-                buf.writeBytes(bytesPassword);
-
-                ctx.writeAndFlush(buf);
-            }
             throw new IllegalArgumentException("Unknown outbound command");
         }
     }
@@ -75,6 +60,25 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 LengthBytesDataTypes.INT.getLength() + lengthPassword);
 
         buf.writeByte(SignalBytes.REQUEST_AUTHORIZE.getSignalByte());
+        buf.writeInt(lengthLogin);
+        buf.writeBytes(bytesLogin);
+        buf.writeInt(lengthPassword);
+        buf.writeBytes(bytesPassword);
+
+        ctx.writeAndFlush(buf);
+    }
+
+    private void sendRequestNewUser(ChannelHandlerContext ctx, RequestRegisterUser req) {
+        byte[] bytesLogin = req.getLogin().getBytes(StandardCharsets.UTF_8);
+        int lengthLogin = bytesLogin.length;
+        byte[] bytesPassword = req.getPassword();
+        int lengthPassword = bytesPassword.length;
+
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
+                LengthBytesDataTypes.INT.getLength() + lengthLogin +
+                LengthBytesDataTypes.INT.getLength() + lengthPassword);
+
+        buf.writeByte(SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte());
         buf.writeInt(lengthLogin);
         buf.writeBytes(bytesLogin);
         buf.writeInt(lengthPassword);
