@@ -1,23 +1,12 @@
 package com.example.client.network.networking;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 public class RequestRegisterUser implements Networking{
     private String login;
     private byte[] password;
 
     public RequestRegisterUser(String login, String password) {
-        MessageDigest md = null;
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
         this.login = login;
-        assert md != null;
-        this.password = md.digest(password.getBytes(StandardCharsets.UTF_8));
+        this.password = MD5HashPassword.getBytesHashPassword(password);
     }
 
     public String getLogin() {
