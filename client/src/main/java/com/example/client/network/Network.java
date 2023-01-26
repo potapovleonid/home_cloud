@@ -15,6 +15,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 public class Network {
@@ -24,12 +28,18 @@ public class Network {
     public void start(CountDownLatch countDownNetworkConnections) {
         EventLoopGroup group = new NioEventLoopGroup();
 
-        try {
+        try(InputStream in = new FileInputStream("config.properties")) {
+//            TODO another class with configs
+            Properties properties = new Properties();
+            properties.load(in);
+            String ip = properties.getProperty("ip.address");
+            int port = Integer.parseInt(properties.getProperty("port"));
+
             Bootstrap clientBootstrap = new Bootstrap();
             clientBootstrap
                     .group(group)
                     .channel(NioSocketChannel.class)
-                    .remoteAddress("localhost", 8189)
+                    .remoteAddress(ip, port)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sh) {
@@ -43,7 +53,7 @@ public class Network {
             ChannelFuture channelFuture = clientBootstrap.connect().sync();
             countDownNetworkConnections.countDown();
             channelFuture.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
