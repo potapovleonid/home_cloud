@@ -16,7 +16,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 public class Network {
@@ -46,7 +45,9 @@ public class Network {
             ChannelFuture channelFuture = clientBootstrap.connect().sync();
             countDownNetworkConnections.countDown();
             channelFuture.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+            countDownNetworkConnections.countDown();
             e.printStackTrace();
         }
     }
