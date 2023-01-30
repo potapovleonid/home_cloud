@@ -48,6 +48,8 @@ public class FXController extends Application {
             controller.updateServerFileList(files);
         });
 
+        stage.setOnCloseRequest(event -> System.exit(0));
+
         stage.show();
     }
 
