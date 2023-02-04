@@ -22,8 +22,8 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg){
-        if(resultAuth){
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        if (resultAuth) {
             ctx.fireChannelRead(msg);
             return;
         }
@@ -32,37 +32,52 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         byte signal = buf.readByte();
 
-        if (signal == SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte()){
-            logger.info("Get signal register new user");
-
-            readAndSetLoginAndPassword(buf);
-            logger.info(String.format("Get login: %s", login));
-
-            boolean resultRegisterUser = SQLConnection.addUser(login, password);
-
-            sendResponseResultAndClearCredentials(ctx, resultRegisterUser, SignalBytes.SUCCESS_REGISTER_USER, SignalBytes.FAILED_REGISTER_USER);
+        if (signal == SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte()) {
+            getRequestAndRegisterNewUser(ctx, buf);
         }
 
         if (signal == SignalBytes.REQUEST_AUTHORIZE.getSignalByte()) {
-            logger.info("Get signal authorize user");
+            getRequestAndAuthorize(ctx, buf);
+        }
+    }
 
-            readAndSetLoginAndPassword(buf);
-            logger.info(String.format("Get login: %s", login));
+    private void getRequestAndRegisterNewUser(ChannelHandlerContext ctx, ByteBuf buf) {
+        logger.info("Get signal register new user");
 
-            resultAuth = SQLConnection.authorizeUser(login, password);
+        readAndSetLoginAndPassword(buf);
+        logger.info(String.format("Get login: %s", login));
 
-            logger.info(String.format("Result auth: %b", resultAuth));
+        boolean resultRegisterUser = SQLConnection.addUser(login, password);
 
-            if (resultAuth) {
-                sendResponseResultAndClearCredentials(ctx, resultAuth, SignalBytes.SUCCESS_AUTH, SignalBytes.FAILED_AUTH);
-                ctx.fireChannelRead(login);
-            }
+        sendResponseResultAndClearCredentials(ctx, resultRegisterUser, SignalBytes.SUCCESS_REGISTER_USER, SignalBytes.FAILED_REGISTER_USER);
+    }
+
+    private void getRequestAndAuthorize(ChannelHandlerContext ctx, ByteBuf buf) {
+        logger.info("Get signal authorize user");
+
+        readAndSetLoginAndPassword(buf);
+        logger.info(String.format("Get login: %s", login));
+
+        resultAuth = SQLConnection.authorizeUser(login, password);
+
+        logger.info(String.format("Result auth: %b", resultAuth));
+
+        if (resultAuth) {
+            sendResponseResultAndClearCredentials(ctx, resultAuth, SignalBytes.SUCCESS_AUTH, SignalBytes.FAILED_AUTH);
+            ctx.fireChannelRead(login);
         }
     }
 
     private void readAndSetLoginAndPassword(ByteBuf buf) {
         login = readLoginFromBuff(buf);
         password = readPasswordFromBuff(buf);
+    }
+
+    private String readLoginFromBuff(ByteBuf buf) {
+        int lengthLogin = buf.readInt();
+        byte[] loginBytes = new byte[lengthLogin];
+        buf.readBytes(loginBytes);
+        return new String(loginBytes, StandardCharsets.UTF_8);
     }
 
     private String readPasswordFromBuff(ByteBuf buf) {
@@ -73,14 +88,7 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         return new String(passwordBytes, StandardCharsets.UTF_8);
     }
 
-    private String readLoginFromBuff(ByteBuf buf) {
-        int lengthLogin = buf.readInt();
-        byte[] loginBytes = new byte[lengthLogin];
-        buf.readBytes(loginBytes);
-        return new String(loginBytes, StandardCharsets.UTF_8);
-    }
-
-    private void sendResponseResultAndClearCredentials(ChannelHandlerContext ctx, boolean result, SignalBytes signalTrue, SignalBytes signalFalse){
+    private void sendResponseResultAndClearCredentials(ChannelHandlerContext ctx, boolean result, SignalBytes signalTrue, SignalBytes signalFalse) {
         ByteBuf byteBufResponse = getByteBufWithResponse(result, signalTrue, signalFalse);
 
         ctx.writeAndFlush(byteBufResponse);
