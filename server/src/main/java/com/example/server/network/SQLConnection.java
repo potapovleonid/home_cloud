@@ -51,6 +51,26 @@ public class SQLConnection {
         return false;
     }
 
+    public static boolean changePassword(String login, String oldPassword, String newPassword){
+        try {
+            String sql = String.format("SELECT login, password " +
+                                        "FROM users " +
+                                        "WHERE login = '%s' and password = '%s'", login, oldPassword);
+            ResultSet rs = statement.executeQuery(sql);
+            boolean result = rs.next();
+            if (result){
+                sql = String.format("UPDATE users " +
+                                    "SET login = '%s', password = '%s' " +
+                                    "WHERE login = '%s', and password ='%s'", login, newPassword, login, oldPassword);
+                statement.executeQuery(sql);
+            }
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static boolean deleteUser(String login, String password){
         try {
             String sql = String.format("DELETE FROM users WHERE login ='%s' and password ='%s'", login, password);
