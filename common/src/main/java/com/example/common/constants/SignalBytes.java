@@ -1,17 +1,22 @@
 package com.example.common.constants;
 
 public enum SignalBytes {
-    SENDING_FILE((byte) 25),
-    SENDING_LIST((byte) 23),
-    REQUEST_LIST((byte) 115),
-    REQUEST_FILE((byte) 105),
-    REQUEST_REGISTER_NEW_USER((byte) 111),
-    REQUEST_AUTHORIZE((byte) 107),
-    RECEIVED_SUCCESS_FILE((byte) 17),
-    SUCCESS_AUTH((byte) 127),
-    SUCCESS_REGISTER_USER((byte) 126),
-    FAILED_REGISTER_USER((byte) -125),
-    FAILED_AUTH((byte) -128);
+    REQUEST_FILE((byte) 10),
+    SENDING_FILE((byte) 11),
+    RECEIVED_SUCCESS_FILE((byte) 12),
+
+    REQUEST_LIST((byte) 20),
+    SENDING_LIST((byte) 21),
+
+    REQUEST_AUTHORIZE((byte) 30),
+    SUCCESS_AUTH((byte) 31),
+    FAILED_AUTH((byte) 32),
+
+    REQUEST_REGISTER_NEW_USER((byte) 50),
+    SUCCESS_REGISTER_USER((byte) 51),
+    FAILED_REGISTER_USER((byte) 52),
+
+    REQUEST_CHANGE_PASSWORD((byte) -120);
 
     private final byte signalByte;
 

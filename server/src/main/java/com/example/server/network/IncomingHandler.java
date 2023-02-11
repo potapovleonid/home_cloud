@@ -108,6 +108,9 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         if (checkState == SignalBytes.REQUEST_LIST.getSignalByte()) {
             sendFileList(ctx);
         }
+        if (checkState == SignalBytes.REQUEST_CHANGE_PASSWORD.getSignalByte()){
+//            TODO
+        }
     }
 
     private void swapHandlerState(HandlerState state, String loggerMsg) {
