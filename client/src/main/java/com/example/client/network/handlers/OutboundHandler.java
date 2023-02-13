@@ -37,10 +37,12 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 return;
             }
             if (obj instanceof RequestList) {
+                System.out.println("request list");
                 sendRequestList(ctx);
                 return;
             }
             if (obj instanceof SendFile) {
+                System.out.println("send file");
                 SendFile file = (SendFile) obj;
                 sendFile(ctx, file);
                 return;

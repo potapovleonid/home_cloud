@@ -52,11 +52,11 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
                     checkingSignalByte(buf, ctx);
                     break;
                 case NAME_LENGTH:
-                    readingFilenameLength(buf);
+                    readingStringLength(buf, filenameLength);
                     swapHandlerState(HandlerState.NAME, "Length name: " + filenameLength + " bytes");
                     break;
                 case NAME:
-                    readingFilename(buf);
+                    readingStringOnLength(buf, filenameLength, filename);
                     checkExistFileAndCreateOutput();
                     swapHandlerState(HandlerState.FILE_LENGTH, "Filename: " + filename);
                     break;
@@ -108,8 +108,12 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         if (checkState == SignalBytes.REQUEST_LIST.getSignalByte()) {
             sendFileList(ctx);
         }
-        if (checkState == SignalBytes.REQUEST_CHANGE_PASSWORD.getSignalByte()){
-//            TODO
+        if (checkState == SignalBytes.REQUEST_CHANGE_PASSWORD.getSignalByte()) {
+            int loginLength = 0;
+            readingStringLength(buf, loginLength);
+
+            String login;
+//TODO
         }
     }
 
@@ -118,17 +122,17 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         logger.info(loggerMsg);
     }
 
-    private void readingFilenameLength(ByteBuf buf) {
+    private void readingStringLength(ByteBuf buf, int setLength) {
         if (buf.readableBytes() >= LengthBytesDataTypes.INT.getLength()) {
-            filenameLength = buf.readInt();
+            setLength = buf.readInt();
         }
     }
 
-    private void readingFilename(ByteBuf buf) {
-        if (buf.readableBytes() >= filenameLength) {
-            byte[] byteBufFilename = new byte[filenameLength];
+    private void readingStringOnLength(ByteBuf buf, int stringLength, String setString) {
+        if (buf.readableBytes() >= stringLength) {
+            byte[] byteBufFilename = new byte[stringLength];
             buf.readBytes(byteBufFilename);
-            filename = new String(byteBufFilename, StandardCharsets.UTF_8);
+            setString = new String(byteBufFilename, StandardCharsets.UTF_8);
         }
     }
 
@@ -181,12 +185,12 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readRequestFilenameLength(ByteBuf buf) {
-        readingFilenameLength(buf);
+        readingStringLength(buf, filenameLength);
         swapHandlerState(HandlerState.REQUEST_NAME, "Filename length " + filenameLength);
     }
 
     private void readingRequestFilenameAndSendFile(ByteBuf buf, ChannelHandlerContext ctx) {
-        readingFilename(buf);
+        readingStringOnLength(buf, filenameLength, filename);
         sendRequestFile(ctx);
         swapHandlerState(HandlerState.IDLE, "Request filename: " + filename);
     }
