@@ -11,19 +11,11 @@ public class ClientApp {
 
         try {
             CountDownLatch countDownNetworkConnections = new CountDownLatch(1);
-            networkThread = new Thread(() -> Network.getNetwork().start(countDownNetworkConnections));
-            networkThread.start();
-
+            new Thread(() -> Network.getNetwork().start(countDownNetworkConnections)).start();
             countDownNetworkConnections.await();
-
-            if (networkThread.isInterrupted()){
-                System.exit(0);
-                return;
-            }
 
             fxController.startFX();
         } catch (InterruptedException e) {
-            System.exit(0);
             e.printStackTrace();
         }
     }
