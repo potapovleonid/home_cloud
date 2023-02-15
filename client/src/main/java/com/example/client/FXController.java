@@ -57,7 +57,7 @@ public class FXController extends Application {
         launch();
     }
 
-    public void replaceSceneContent(String fxmlName) throws Exception {
+    public void replaceSceneContent(String fxmlName) {
         Platform.runLater(() -> {
             try {
                 Parent page = FXMLLoader.load(Objects.requireNonNull(FXController.class.getResource(fxmlName)),
