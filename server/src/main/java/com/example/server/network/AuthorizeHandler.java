@@ -32,11 +32,11 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         byte signal = buf.readByte();
 
-        if (signal == SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte()) {
+        if (signal == SignalBytes.REGISTER_NEW_USER_REQUEST.getSignalByte()) {
             getRequestAndRegisterNewUser(ctx, buf);
         }
 
-        if (signal == SignalBytes.REQUEST_AUTHORIZE.getSignalByte()) {
+        if (signal == SignalBytes.AUTHORIZE_REQUEST.getSignalByte()) {
             getRequestAndAuthorize(ctx, buf);
         }
     }
@@ -49,7 +49,7 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         boolean resultRegisterUser = SQLConnection.addUser(login, password);
 
-        sendResponseResultAndClearCredentials(ctx, resultRegisterUser, SignalBytes.SUCCESS_REGISTER_USER, SignalBytes.FAILED_REGISTER_USER);
+        sendResponseResultAndClearCredentials(ctx, resultRegisterUser, SignalBytes.REGISTER_USER_SUCCESS, SignalBytes.REGISTER_USER_FAILED);
     }
 
     private void getRequestAndAuthorize(ChannelHandlerContext ctx, ByteBuf buf) {
@@ -63,7 +63,7 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         logger.info(String.format("Result auth: %b", resultAuth));
 
         if (resultAuth) {
-            sendResponseResultAndClearCredentials(ctx, resultAuth, SignalBytes.SUCCESS_AUTH, SignalBytes.FAILED_AUTH);
+            sendResponseResultAndClearCredentials(ctx, resultAuth, SignalBytes.AUTHORIZE_SUCCESS, SignalBytes.AUTHORIZE_FAILED);
             ctx.fireChannelRead(login);
         }
     }
