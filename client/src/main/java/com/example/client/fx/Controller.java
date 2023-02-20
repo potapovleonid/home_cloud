@@ -73,8 +73,6 @@ public class Controller implements Initializable {
                             }
                         },
                         LoggerApp.getLogger()));
-        System.out.println(Network.getNetwork());
-        System.out.println(Network.getNetwork().getChannel().toString());
     }
 
     public void btnDownloadAction(ActionEvent actionEvent) {
