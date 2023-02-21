@@ -79,15 +79,15 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     private void checkingSignalByte(ByteBuf buf) {
         byte checkState = buf.readByte();
-        if (checkState == SignalBytes.SENDING_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_SENDING.getSignalByte()) {
             receivedFileLength = 0L;
             handlerState = HandlerState.NAME_LENGTH;
             logger.info("File state is user send file");
         }
-        if (checkState == SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte()) {
             logger.info("File sending success");
         }
-        if (checkState == SignalBytes.SENDING_LIST.getSignalByte()) {
+        if (checkState == SignalBytes.LIST_SENDING.getSignalByte()) {
             handlerState = HandlerState.LIST_LENGTH;
             logger.info("Send file list");
         }

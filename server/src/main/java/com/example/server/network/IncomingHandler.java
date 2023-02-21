@@ -95,25 +95,21 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     private void checkingSignalByte(ByteBuf buf, ChannelHandlerContext ctx) {
         byte checkState = buf.readByte();
-        if (checkState == SignalBytes.SENDING_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_SENDING.getSignalByte()) {
             receivedFileLength = 0L;
             swapHandlerState(HandlerState.NAME_LENGTH, "File state is user send file");
         }
-        if (checkState == SignalBytes.REQUEST_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_REQUEST.getSignalByte()) {
             swapHandlerState(HandlerState.REQUEST_NAME_LENGTH, "Request file");
         }
-        if (checkState == SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte()) {
             logger.info("File sending success");
         }
-        if (checkState == SignalBytes.REQUEST_LIST.getSignalByte()) {
+        if (checkState == SignalBytes.LIST_REQUEST.getSignalByte()) {
             sendFileList(ctx);
         }
-        if (checkState == SignalBytes.REQUEST_CHANGE_PASSWORD.getSignalByte()) {
-            int loginLength = 0;
-            readingStringLength(buf, loginLength);
-
-            String login;
-//TODO
+        if (checkState == SignalBytes.CHANGE_PASSWORD_REQUEST.getSignalByte()) {
+//TODO read length and read login and password
         }
     }
 
@@ -179,7 +175,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     private void successfullyReceivedFile(ChannelHandlerContext ctx) {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
-        buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
+        buf.writeByte(SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte());
         ctx.writeAndFlush(buf);
         ListSender.sendList(Paths.get(pathSaveFiles), ctx.channel(), logger);
     }
