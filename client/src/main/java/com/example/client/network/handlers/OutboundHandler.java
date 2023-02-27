@@ -37,16 +37,15 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 return;
             }
             if (obj instanceof RequestList) {
-                System.out.println("request list");
                 sendRequestList(ctx);
                 return;
             }
             if (obj instanceof SendFile) {
-                System.out.println("send file");
                 SendFile file = (SendFile) obj;
                 sendFile(ctx, file);
                 return;
             }
+//           TODO request change pass
             throw new IllegalArgumentException("Unknown outbound command");
         }
     }
@@ -61,7 +60,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 LengthBytesDataTypes.INT.getLength() + lengthLogin +
                 LengthBytesDataTypes.INT.getLength() + lengthPassword);
 
-        buf.writeByte(SignalBytes.REQUEST_AUTHORIZE.getSignalByte());
+        buf.writeByte(SignalBytes.AUTHORIZE_REQUEST.getSignalByte());
         buf.writeInt(lengthLogin);
         buf.writeBytes(bytesLogin);
         buf.writeInt(lengthPassword);
@@ -80,7 +79,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 LengthBytesDataTypes.INT.getLength() + lengthLogin +
                 LengthBytesDataTypes.INT.getLength() + lengthPassword);
 
-        buf.writeByte(SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte());
+        buf.writeByte(SignalBytes.REGISTER_NEW_USER_REQUEST.getSignalByte());
         buf.writeInt(lengthLogin);
         buf.writeBytes(bytesLogin);
         buf.writeInt(lengthPassword);
@@ -96,7 +95,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
                 LengthBytesDataTypes.INT.getLength() + lengthFilename);
 
-        buf.writeByte(SignalBytes.REQUEST_FILE.getSignalByte());
+        buf.writeByte(SignalBytes.FILE_REQUEST.getSignalByte());
         buf.writeInt(lengthFilename);
         buf.writeBytes(fileNameBytes);
 
@@ -106,14 +105,14 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
     private void sendResponseGetStatus(ChannelHandlerContext ctx, ResponseStatusComplete resp) {
         if (resp.isStatus()) {
             ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
-            buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
+            buf.writeByte(SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte());
             ctx.writeAndFlush(buf);
         }
     }
 
     private void sendRequestList(ChannelHandlerContext ctx) {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
-        buf.writeByte(SignalBytes.REQUEST_LIST.getSignalByte());
+        buf.writeByte(SignalBytes.LIST_REQUEST.getSignalByte());
         ctx.writeAndFlush(buf);
     }
 
