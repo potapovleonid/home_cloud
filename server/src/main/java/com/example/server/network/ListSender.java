@@ -25,7 +25,7 @@ public class ListSender {
 
             ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4);
 
-            buf.writeByte(SignalBytes.SENDING_LIST.getSignalByte());
+            buf.writeByte(SignalBytes.LIST_SENDING.getSignalByte());
             buf.writeInt(listFilesLength);
 
             channel.writeAndFlush(buf);
