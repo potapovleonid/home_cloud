@@ -31,7 +31,7 @@ public class FileSender {
 
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(length);
 
-        buf.writeByte(SignalBytes.SENDING_FILE.getSignalByte());
+        buf.writeByte(SignalBytes.FILE_SENDING.getSignalByte());
         buf.writeInt(filenameLength);
         buf.writeBytes(filenameBytes);
         buf.writeLong(fileLength);
