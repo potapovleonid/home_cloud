@@ -65,6 +65,7 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         if (resultAuth) {
             sendResponseResultAndClearCredentials(ctx, resultAuth, SignalBytes.AUTHORIZE_SUCCESS, SignalBytes.AUTHORIZE_FAILED);
             ctx.fireChannelRead(login);
+            clearPasswordAndLogin();
         }
     }
 
@@ -92,7 +93,6 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBufResponse = getByteBufWithResponse(result, signalTrue, signalFalse);
 
         ctx.writeAndFlush(byteBufResponse);
-        clearPasswordAndLogin();
     }
 
     private ByteBuf getByteBufWithResponse(boolean result, SignalBytes signalTrue, SignalBytes signalFalse) {
