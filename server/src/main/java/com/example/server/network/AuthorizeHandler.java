@@ -107,7 +107,7 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void clearPasswordAndLogin() {
-        password = null;
         login = null;
+        password = null;
     }
 }
