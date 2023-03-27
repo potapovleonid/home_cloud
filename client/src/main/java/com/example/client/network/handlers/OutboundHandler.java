@@ -45,7 +45,11 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 sendFile(ctx, file);
                 return;
             }
-//           TODO request change pass
+            if (obj instanceof RequestChangePassword){
+                RequestChangePassword req = (RequestChangePassword) obj;
+                sendRequestChangePassword(req);
+                return;
+            }
             throw new IllegalArgumentException("Unknown outbound command");
         }
     }
@@ -123,5 +127,9 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 file.getChannelFutureListener(),
                 file.getLogger()
         );
+    }
+
+    private void sendRequestChangePassword(RequestChangePassword req){
+//        TODO
     }
 }

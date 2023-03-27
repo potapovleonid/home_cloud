@@ -15,13 +15,22 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
 public class IncomingHandler extends ChannelInboundHandlerAdapter {
+    private enum typeValues{
+        FILENAME, OLD_PASSWORD, NEW_PASSWORD
+    }
+
+    private String login;
     private HandlerState handlerState = HandlerState.IDLE;
 
-    private int filenameLength;
+    private int stringLength;
     private String filename;
+
+    private BufferedOutputStream out;
     private long fileLength;
     private long receivedFileLength;
-    private BufferedOutputStream out;
+
+    private String oldPassword;
+    private String password;
 
     private String pathSaveFiles;
     private final Logger logger;
@@ -53,10 +62,10 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
                     break;
                 case NAME_LENGTH:
                     readingStringLength(buf);
-                    swapHandlerState(HandlerState.NAME, "Length name: " + filenameLength + " bytes");
+                    swapHandlerState(HandlerState.NAME, "Length name: " + stringLength + " bytes");
                     break;
                 case NAME:
-                    readingStringOnLength(buf, filenameLength);
+                    readingStringOnLength(buf, stringLength, typeValues.FILENAME);
                     checkExistFileAndCreateOutput();
                     swapHandlerState(HandlerState.FILE_LENGTH, "Filename: " + filename);
                     break;
@@ -86,6 +95,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     private boolean checkAndSetUserLoginIfMsgIsLogin(Object msg) {
         if (msg instanceof String) {
             String userLogin = (String) msg;
+            login = userLogin;
             pathSaveFiles += FileSystems.getDefault().getSeparator() + userLogin;
             logger.info("Set path save files: " + pathSaveFiles);
             return true;
@@ -113,7 +123,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         if (checkState == SignalBytes.CHANGE_PASSWORD_REQUEST.getSignalByte()) {
-//TODO read length and read login and password
+//TODO read length and read passwords
 //            return;
         }
     }
@@ -125,21 +135,30 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     private void readingStringLength(ByteBuf buf) {
         if (buf.readableBytes() >= LengthBytesDataTypes.INT.getLength()) {
-            filenameLength = buf.readInt();
+            stringLength = buf.readInt();
         }
     }
 
-    private void readingStringOnLength(ByteBuf buf, int stringLength) {
+    private void readingStringOnLength(ByteBuf buf, int stringLength, typeValues type) {
         if (buf.readableBytes() >= stringLength) {
             byte[] byteBufFilename = new byte[stringLength];
             buf.readBytes(byteBufFilename);
-            filename = new String(byteBufFilename, StandardCharsets.UTF_8);
+            if (type == typeValues.FILENAME){
+                filename = new String(byteBufFilename, StandardCharsets.UTF_8);
+                return;
+            }
+            if (type == typeValues.OLD_PASSWORD){
+                password = new String(byteBufFilename, StandardCharsets.UTF_8);
+                return;
+            }
+            if (type == typeValues.NEW_PASSWORD){
+                password = new String(byteBufFilename, StandardCharsets.UTF_8);
+            }
         }
     }
 
     private void checkExistFileAndCreateOutput() {
         checkExistsFilePathAndCreate();
-
         try {
             out = new BufferedOutputStream(new FileOutputStream(pathSaveFiles +
                     FileSystems.getDefault().getSeparator() + filename));
@@ -188,11 +207,11 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     private void readRequestFilenameLength(ByteBuf buf) {
         readingStringLength(buf);
-        swapHandlerState(HandlerState.REQUEST_NAME, "Filename length " + filenameLength);
+        swapHandlerState(HandlerState.REQUEST_NAME, "Filename length " + stringLength);
     }
 
     private void readingRequestFilenameAndSendFile(ByteBuf buf, ChannelHandlerContext ctx) {
-        readingStringOnLength(buf, filenameLength);
+        readingStringOnLength(buf, stringLength, typeValues.FILENAME);
         sendRequestFile(ctx);
         swapHandlerState(HandlerState.IDLE, "Request filename: " + filename);
     }
