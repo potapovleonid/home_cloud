@@ -12,6 +12,7 @@
       fx:controller="com.example.client.fx.Controller">
     <MenuBar>
         <Menu text="File">
+            <MenuItem text="Change password" onAction="#btnChangePassword"/>
             <MenuItem text="Exit" onAction="#btnExitAction"/>
         </Menu>
     </MenuBar>

@@ -32,10 +32,6 @@ public class Controller implements Initializable {
         AppControllers.setController(this);
     }
 
-    public void btnExitAction(ActionEvent actionEvent) {
-        Platform.exit();
-    }
-
     public void btnUploadAction(ActionEvent actionEvent) {
         PanelController tLeftPanel = (PanelController) leftPanel.getProperties().get("ctrl");
         Path uploadFile;
@@ -95,4 +91,14 @@ public class Controller implements Initializable {
     public void btnUpdateFileList(ActionEvent actionEvent) {
         Network.getNetwork().getChannel().writeAndFlush(new RequestList());
     }
+
+    public void btnChangePassword(ActionEvent actionEvent) {
+//        TODO create change password panel
+    }
+
+    public void btnExitAction(ActionEvent actionEvent) {
+        Platform.exit();
+        System.exit(0);
+    }
+
 }
