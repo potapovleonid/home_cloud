@@ -31,7 +31,7 @@ public class FXController extends Application {
         Network.getNetwork().setCallbackAuthenticated(resultAuth -> {
             if (resultAuth) {
                 LoggerApp.info("Auth success");
-                ReplaceSceneManager.replaceSceneContent("main.fxml");
+                ReplaceSceneManager.replaceSceneContent("main.fxml", "Home cloud");
                 Platform.runLater(() -> {
                     Network.getNetwork().getChannel().writeAndFlush(new RequestList());
                 });

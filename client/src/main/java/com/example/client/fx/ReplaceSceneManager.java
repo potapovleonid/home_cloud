@@ -19,7 +19,7 @@ public class ReplaceSceneManager {
         ReplaceSceneManager.stage = stage;
     }
 
-    public static void replaceSceneContent(String fxmlName){
+    public static void replaceSceneContent(String fxmlName, String titleScene){
         if (stage == null){
             JOptionPane.showMessageDialog(null, "Stage were'nt set in ReplaceSceneManager");
             System.exit(0);
@@ -38,7 +38,7 @@ public class ReplaceSceneManager {
                     stage.setScene(scene);
                 } else {
                     stage.getScene().setRoot(page);
-                    stage.setTitle("Home cloud");
+                    stage.setTitle(titleScene);
                 }
                 stage.sizeToScene();
                 stage.show();
