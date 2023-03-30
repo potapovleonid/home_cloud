@@ -5,9 +5,10 @@ import com.example.client.network.networking.RequestAuthorize;
 import com.example.client.network.networking.RequestRegisterUser;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
+
+import javax.swing.*;
+import java.util.Objects;
 
 public class AuthController {
 
@@ -18,15 +19,17 @@ public class AuthController {
     public TextField passwordField;
 
     public void sendAuthCredential(ActionEvent actionEvent) {
-        if (loginField.getText() == null || passwordField.getText() == null){
-            new Alert(Alert.AlertType.WARNING, "Someone field is empty, please try again", ButtonType.OK);
+        if (Objects.equals(loginField.getText(), "") || Objects.equals(passwordField.getText(), "")){
+            JOptionPane.showMessageDialog(null, "Someone field is empty, please try again");
+            return;
         }
         Network.getNetwork().getChannel().writeAndFlush(new RequestAuthorize(loginField.getText(), passwordField.getText()));
     }
 
     public void sendRegisterCredentials(ActionEvent actionEvent) {
-        if (loginField.getText() == null || passwordField.getText() == null){
-            new Alert(Alert.AlertType.WARNING, "Someone field is empty, please try again", ButtonType.OK);
+        if (Objects.equals(loginField.getText(), "") || Objects.equals(passwordField.getText(), "")){
+            JOptionPane.showMessageDialog(null, "Someone field is empty, please try again");
+            return;
         }
         Network.getNetwork().getChannel().writeAndFlush(new RequestRegisterUser(loginField.getText(), passwordField.getText()));
     }

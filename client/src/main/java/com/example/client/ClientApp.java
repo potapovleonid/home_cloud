@@ -1,6 +1,8 @@
 package com.example.client;
 
 import com.example.client.network.Network;
+
+import javax.swing.*;
 import java.util.concurrent.CountDownLatch;
 
 public class ClientApp {
@@ -17,14 +19,16 @@ public class ClientApp {
             countDownNetworkConnections.await();
 
             if (networkThread.isInterrupted()){
+                JOptionPane.showMessageDialog(null, "Connection is failed server, check config file or server activity");
+                LoggerApp.warn("Connection is failed server");
                 System.exit(0);
                 return;
             }
 
             fxController.startFX();
         } catch (InterruptedException e) {
-            System.exit(0);
             e.printStackTrace();
+            System.exit(0);
         }
     }
 

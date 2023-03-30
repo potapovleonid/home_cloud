@@ -19,7 +19,6 @@ public class ChangePasswordController {
 
     public void btnChangePassword(ActionEvent actionEvent) {
         if (Objects.equals(oldPassword.getText(), "") || Objects.equals(newPassword.getText(), "")){
-//            TODO swap all alert
             JOptionPane.showMessageDialog(null, "Someone field is empty, please try again");
             return;
         }

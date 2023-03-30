@@ -39,14 +39,12 @@ public class Controller implements Initializable {
         try {
             uploadFile = tLeftPanel.getCurrentPath().resolve(tLeftPanel.getSelectedFilename());
         } catch (NullPointerException e){
-            new Alert(Alert.AlertType.ERROR, "No one file isn't selected for upload",
-                    ButtonType.OK).showAndWait();
+            JOptionPane.showMessageDialog(null, "No one file isn't selected for upload");
             return;
         }
 
         if (Files.isDirectory(uploadFile)) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Select file is directory", ButtonType.OK);
-            alert.showAndWait();
+            JOptionPane.showMessageDialog(null, "Select file is directory");
             return;
         }
 
@@ -78,6 +76,7 @@ public class Controller implements Initializable {
             LoggerApp.info("Send request on download file: " + tRightPanel.getSelectedFilename());
             Network.getNetwork().getChannel().writeAndFlush(new RequestFile(tRightPanel.getSelectedFilename()));
         } else {
+//            TODO SWAP all alert on JOptionPane
             new Alert(Alert.AlertType.ERROR, "No one file isn't selected for download",
                     ButtonType.OK).showAndWait();
         }
@@ -93,7 +92,7 @@ public class Controller implements Initializable {
     }
 
     public void btnChangePassword(ActionEvent actionEvent) {
-//        TODO create change password panel
+        ReplaceSceneManager.replaceSceneContent("changePasswordPanel.fxml", "Change password");
     }
 
     public void btnExitAction(ActionEvent actionEvent) {

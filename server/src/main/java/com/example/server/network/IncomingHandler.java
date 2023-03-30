@@ -123,7 +123,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         if (checkState == SignalBytes.CHANGE_PASSWORD_REQUEST.getSignalByte()) {
-//TODO read length and read passwords
+//TODO read length and read passwords int + old pass + int + new pass
 //            return;
         }
     }
