@@ -9,11 +9,7 @@ public class AppControllers {
 
     public static void setController(Controller controller) {
         LoggerApp.info("CONTROLLER SET: " + controller.toString());
-        if (controller != null) {
-            AppControllers.controller = controller;
-        } else {
-            throw new RuntimeException("Controller already set");
-        }
+        AppControllers.controller = controller;
     }
 
     public static Controller getController() {

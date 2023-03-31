@@ -19,7 +19,8 @@ public class ChangePasswordController {
 
     public void btnChangePassword(ActionEvent actionEvent) {
         if (Objects.equals(oldPassword.getText(), "") || Objects.equals(newPassword.getText(), "")){
-            JOptionPane.showMessageDialog(null, "Someone field is empty, please try again");
+            JOptionPane.showMessageDialog(null, "Someone field is empty, please try again",
+                    "Empty field", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 //        TODO check length, check equals new and old passwords

@@ -20,7 +20,8 @@ public class AuthController {
 
     public void sendAuthCredential(ActionEvent actionEvent) {
         if (Objects.equals(loginField.getText(), "") || Objects.equals(passwordField.getText(), "")){
-            JOptionPane.showMessageDialog(null, "Someone field is empty, please try again");
+            JOptionPane.showMessageDialog(null, "Someone field is empty, please try again",
+                    "Empty field", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         Network.getNetwork().getChannel().writeAndFlush(new RequestAuthorize(loginField.getText(), passwordField.getText()));
@@ -28,7 +29,8 @@ public class AuthController {
 
     public void sendRegisterCredentials(ActionEvent actionEvent) {
         if (Objects.equals(loginField.getText(), "") || Objects.equals(passwordField.getText(), "")){
-            JOptionPane.showMessageDialog(null, "Someone field is empty, please try again");
+            JOptionPane.showMessageDialog(null, "Someone field is empty, please try again",
+                    "Empty field", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         Network.getNetwork().getChannel().writeAndFlush(new RequestRegisterUser(loginField.getText(), passwordField.getText()));
