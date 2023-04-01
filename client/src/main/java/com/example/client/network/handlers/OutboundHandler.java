@@ -1,5 +1,6 @@
 package com.example.client.network.handlers;
 
+import com.example.client.LoggerApp;
 import com.example.client.network.networking.*;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
@@ -45,9 +46,9 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 sendFile(ctx, file);
                 return;
             }
-            if (obj instanceof RequestChangePassword){
+            if (obj instanceof RequestChangePassword) {
                 RequestChangePassword req = (RequestChangePassword) obj;
-                sendRequestChangePassword(req);
+                sendRequestChangePassword(ctx, req);
                 return;
             }
             throw new IllegalArgumentException("Unknown outbound command");
@@ -118,18 +119,39 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
         buf.writeByte(SignalBytes.LIST_REQUEST.getSignalByte());
         ctx.writeAndFlush(buf);
+        LoggerApp.info("Sent request list");
     }
 
     private void sendFile(ChannelHandlerContext ctx, SendFile file) throws IOException {
         FileSender.sendFile(
                 file.getFilePath(),
                 ctx,
+//                TODO check signal byte or success upload
                 file.getChannelFutureListener(),
                 file.getLogger()
         );
     }
 
-    private void sendRequestChangePassword(RequestChangePassword req){
-//        TODO
+    private void sendRequestChangePassword(ChannelHandlerContext ctx, RequestChangePassword req) {
+        LoggerApp.info("get request change pass");
+        LoggerApp.info("Old pass: " + req.getOldPassword());
+        LoggerApp.info("New pass: " + req.getNewPassword());
+
+        int lengthBytesOldPassword = req.getOldPassword().getBytes(StandardCharsets.UTF_8).length;
+        byte[] bytesOldPassword = req.getOldPassword().getBytes(StandardCharsets.UTF_8);
+        int lengthBytesNewPassword = req.getOldPassword().getBytes(StandardCharsets.UTF_8).length;
+        byte[] bytesNewPassword = req.getOldPassword().getBytes(StandardCharsets.UTF_8);
+
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength()
+                + LengthBytesDataTypes.INT.getLength() + lengthBytesOldPassword
+                + LengthBytesDataTypes.INT.getLength() + lengthBytesNewPassword);
+
+        buf.writeByte(SignalBytes.CHANGE_PASSWORD_REQUEST.getSignalByte());
+        buf.writeInt(lengthBytesOldPassword);
+        buf.writeBytes(bytesOldPassword);
+        buf.writeInt(lengthBytesNewPassword);
+        buf.writeBytes(bytesNewPassword);
+
+        ctx.writeAndFlush(buf);
     }
 }

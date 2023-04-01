@@ -36,6 +36,7 @@ public class FXController extends Application {
                     Network.getNetwork().getChannel().writeAndFlush(new RequestList());
                 });
             } else {
+//                TODO check input and add joptionpane
                 LoggerApp.info("Please try authenticate again");
             }
         });

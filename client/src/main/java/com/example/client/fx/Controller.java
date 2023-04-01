@@ -11,8 +11,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 
 import javax.swing.*;
@@ -39,12 +37,14 @@ public class Controller implements Initializable {
         try {
             uploadFile = tLeftPanel.getCurrentPath().resolve(tLeftPanel.getSelectedFilename());
         } catch (NullPointerException e){
-            JOptionPane.showMessageDialog(null, "No one file isn't selected for upload");
+            JOptionPane.showMessageDialog(null, "No one file isn't selected for upload",
+                    "Select file", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
         if (Files.isDirectory(uploadFile)) {
-            JOptionPane.showMessageDialog(null, "Select file is directory");
+            JOptionPane.showMessageDialog(null, "Select file is directory",
+                    "Select file", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -76,9 +76,8 @@ public class Controller implements Initializable {
             LoggerApp.info("Send request on download file: " + tRightPanel.getSelectedFilename());
             Network.getNetwork().getChannel().writeAndFlush(new RequestFile(tRightPanel.getSelectedFilename()));
         } else {
-//            TODO SWAP all alert on JOptionPane
-            new Alert(Alert.AlertType.ERROR, "No one file isn't selected for download",
-                    ButtonType.OK).showAndWait();
+            JOptionPane.showMessageDialog(null, "No one file isn't selected for download",
+                    "Select file", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

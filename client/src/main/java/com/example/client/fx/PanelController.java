@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileSystems;
@@ -101,8 +102,8 @@ public class PanelController implements Initializable {
             filesTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
             filesTable.sort();
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Failed to update list of files", ButtonType.OK);
-            alert.showAndWait();
+            JOptionPane.showMessageDialog(null, "Failed to update list of files",
+                    "Update files list", JOptionPane.WARNING_MESSAGE);
         }
     }
 
