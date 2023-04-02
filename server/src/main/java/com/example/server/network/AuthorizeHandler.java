@@ -63,11 +63,11 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         logger.info(String.format("Result auth: %b", resultAuth));
 
         if (resultAuth) {
-//            TODO FIX Response if auth false
-            sendResponseResultAndClearCredentials(ctx, resultAuth, SignalBytes.AUTHORIZE_SUCCESS, SignalBytes.AUTHORIZE_FAILED);
             ctx.fireChannelRead(login);
             clearPasswordAndLogin();
         }
+
+        sendResponseResultAndClearCredentials(ctx, resultAuth, SignalBytes.AUTHORIZE_SUCCESS, SignalBytes.AUTHORIZE_FAILED);
     }
 
     private void readAndSetLoginAndPassword(ByteBuf buf) {

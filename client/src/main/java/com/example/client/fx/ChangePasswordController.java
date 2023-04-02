@@ -23,7 +23,7 @@ public class ChangePasswordController {
                     "Empty field", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-//        TODO check length, check equals new and old passwords
+//        TODO check length min 5 letters, check doesn't equals new and old passwords
         Platform.runLater(() -> Network.getNetwork().getChannel().writeAndFlush(new RequestChangePassword(oldPassword.getText(), newPassword.getText())));
     }
 

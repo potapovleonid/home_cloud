@@ -11,6 +11,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+
 public class FXController extends Application {
 
     private Scene authScene;
@@ -36,7 +38,8 @@ public class FXController extends Application {
                     Network.getNetwork().getChannel().writeAndFlush(new RequestList());
                 });
             } else {
-//                TODO check input and add joptionpane
+                JOptionPane.showMessageDialog(null, "Please try authenticate again your login or " +
+                                "password incorrect","Incorrect credentials", JOptionPane.ERROR_MESSAGE);
                 LoggerApp.info("Please try authenticate again");
             }
         });
