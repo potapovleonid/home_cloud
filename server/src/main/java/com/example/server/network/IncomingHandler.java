@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
 public class IncomingHandler extends ChannelInboundHandlerAdapter {
-    private enum typeValues{
+    private enum typeValues {
         FILENAME, OLD_PASSWORD, NEW_PASSWORD
     }
 
@@ -30,7 +30,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     private long receivedFileLength;
 
     private String oldPassword;
-    private String password;
+    private String newPasswords;
 
     private String pathSaveFiles;
     private final Logger logger;
@@ -65,7 +65,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
                     swapHandlerState(HandlerState.NAME, "Length name: " + stringLength + " bytes");
                     break;
                 case NAME:
-                    readingStringOnLength(buf, stringLength, typeValues.FILENAME);
+                    readingStringOnLength(buf, typeValues.FILENAME);
                     checkExistFileAndCreateOutput();
                     swapHandlerState(HandlerState.FILE_LENGTH, "Filename: " + filename);
                     break;
@@ -119,12 +119,22 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         if (checkState == SignalBytes.LIST_REQUEST.getSignalByte()) {
+            logger.info("Send file list");
             sendFileList(ctx);
             return;
         }
         if (checkState == SignalBytes.CHANGE_PASSWORD_REQUEST.getSignalByte()) {
-//TODO read length and read passwords int + old pass + int + new pass
-//            return;
+            logger.info("Get request change password");
+            readingOldAndNewPasswords(buf);
+            logger.info("Check password result: " + checkPasswords());
+            if (checkPasswords()) {
+                boolean result = SQLConnection.changePassword(login, oldPassword, newPasswords);
+                logger.info("Result changing password is: " + result);
+//                TODO Add response true change pass
+                return;
+            }
+//            TODO add response false change pass
+            return;
         }
     }
 
@@ -139,20 +149,20 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void readingStringOnLength(ByteBuf buf, int stringLength, typeValues type) {
+    private void readingStringOnLength(ByteBuf buf, typeValues type) {
         if (buf.readableBytes() >= stringLength) {
             byte[] byteBufFilename = new byte[stringLength];
             buf.readBytes(byteBufFilename);
-            if (type == typeValues.FILENAME){
+            if (type == typeValues.FILENAME) {
                 filename = new String(byteBufFilename, StandardCharsets.UTF_8);
                 return;
             }
-            if (type == typeValues.OLD_PASSWORD){
-                password = new String(byteBufFilename, StandardCharsets.UTF_8);
+            if (type == typeValues.OLD_PASSWORD) {
+                oldPassword = new String(byteBufFilename, StandardCharsets.UTF_8);
                 return;
             }
-            if (type == typeValues.NEW_PASSWORD){
-                password = new String(byteBufFilename, StandardCharsets.UTF_8);
+            if (type == typeValues.NEW_PASSWORD) {
+                newPasswords = new String(byteBufFilename, StandardCharsets.UTF_8);
             }
         }
     }
@@ -211,7 +221,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingRequestFilenameAndSendFile(ByteBuf buf, ChannelHandlerContext ctx) {
-        readingStringOnLength(buf, stringLength, typeValues.FILENAME);
+        readingStringOnLength(buf, typeValues.FILENAME);
         sendRequestFile(ctx);
         swapHandlerState(HandlerState.IDLE, "Request filename: " + filename);
     }
@@ -238,5 +248,17 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         }
         logger.warn(cause.getMessage());
         ctx.close();
+    }
+
+    private void readingOldAndNewPasswords(ByteBuf buf) {
+        readingStringLength(buf);
+        readingStringOnLength(buf, typeValues.OLD_PASSWORD);
+        readingStringLength(buf);
+        readingStringOnLength(buf, typeValues.NEW_PASSWORD);
+        logger.info("Reading passwords completed");
+    }
+
+    private boolean checkPasswords() {
+        return !newPasswords.equals(oldPassword);
     }
 }

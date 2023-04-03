@@ -134,13 +134,11 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
 
     private void sendRequestChangePassword(ChannelHandlerContext ctx, RequestChangePassword req) {
         LoggerApp.info("get request change pass");
-        LoggerApp.info("Old pass: " + req.getOldPassword());
-        LoggerApp.info("New pass: " + req.getNewPassword());
 
-        int lengthBytesOldPassword = req.getOldPassword().getBytes(StandardCharsets.UTF_8).length;
-        byte[] bytesOldPassword = req.getOldPassword().getBytes(StandardCharsets.UTF_8);
-        int lengthBytesNewPassword = req.getOldPassword().getBytes(StandardCharsets.UTF_8).length;
-        byte[] bytesNewPassword = req.getOldPassword().getBytes(StandardCharsets.UTF_8);
+        byte[] bytesOldPassword = req.getBytesOldPassword();
+        int lengthBytesOldPassword = bytesOldPassword.length;
+        byte[] bytesNewPassword = req.getBytesNewPassword();
+        int lengthBytesNewPassword = bytesNewPassword.length;
 
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength()
                 + LengthBytesDataTypes.INT.getLength() + lengthBytesOldPassword
