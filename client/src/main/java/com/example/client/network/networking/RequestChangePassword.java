@@ -2,19 +2,19 @@ package com.example.client.network.networking;
 
 public class RequestChangePassword implements Networking {
 
-    private String oldPassword;
-    private String newPassword;
+    private byte[] bytesOldPassword;
+    private byte[] bytesNewPassword;
 
     public RequestChangePassword(String oldPassword, String newPassword) {
-        this.oldPassword = oldPassword;
-        this.newPassword = newPassword;
+        this.bytesOldPassword = MD5HashPassword.getBytesHashPassword(oldPassword);
+        this.bytesNewPassword = MD5HashPassword.getBytesHashPassword(newPassword);
     }
 
-    public String getOldPassword() {
-        return oldPassword;
+    public byte[] getBytesOldPassword() {
+        return bytesOldPassword;
     }
 
-    public String getNewPassword() {
-        return newPassword;
+    public byte[] getBytesNewPassword() {
+        return bytesNewPassword;
     }
 }
