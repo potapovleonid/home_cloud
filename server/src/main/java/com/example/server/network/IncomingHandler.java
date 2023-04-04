@@ -126,14 +126,13 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         if (checkState == SignalBytes.CHANGE_PASSWORD_REQUEST.getSignalByte()) {
             logger.info("Get request change password");
             readingOldAndNewPasswords(buf);
-            logger.info("Check password result: " + checkPasswords());
             if (checkPasswords()) {
                 boolean result = SQLConnection.changePassword(login, oldPassword, newPasswords);
                 logger.info("Result changing password is: " + result);
-//                TODO Add response true change pass
+                sendSignalByte(ctx, SignalBytes.CHANGE_PASSWORD_SUCCESS.getSignalByte());
                 return;
             }
-//            TODO add response false change pass
+            sendSignalByte(ctx, SignalBytes.CHANGE_PASSWORD_FAILED.getSignalByte());
             return;
         }
     }
@@ -202,18 +201,20 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
                 swapHandlerState(HandlerState.IDLE, "File received");
                 out.close();
                 out = null;
-                successfullyReceivedFile(ctx);
+                sendSignalByte(ctx, SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte());
+                ListSender.sendList(Paths.get(pathSaveFiles), ctx.channel(), logger);
                 break;
             }
         }
     }
 
-    private void successfullyReceivedFile(ChannelHandlerContext ctx) {
+    private void sendSignalByte(ChannelHandlerContext ctx, byte signalByte) {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
-        buf.writeByte(SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte());
+        logger.info("Byte: " + signalByte);
+        buf.writeByte(signalByte);
         ctx.writeAndFlush(buf);
-        ListSender.sendList(Paths.get(pathSaveFiles), ctx.channel(), logger);
     }
+
 
     private void readRequestFilenameLength(ByteBuf buf) {
         readingStringLength(buf);
