@@ -102,6 +102,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingFilesList(ByteBuf buf) throws IOException, ClassNotFoundException {
+        //            TODO crash after 4-5 runs
         if (buf.readableBytes() >= listLength) {
             logger.info("start download list");
 
@@ -114,7 +115,6 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             List<FileInfo> filesList = (List<FileInfo>) ois.readObject();
 
             logger.info(String.format("Files list length %d", filesList.toArray().length));
-
             filesList.forEach(s -> System.out.println(s.toString()));
             handlerState = HandlerState.IDLE;
             logger.info("State: " + handlerState);

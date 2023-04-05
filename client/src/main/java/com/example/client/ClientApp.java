@@ -9,7 +9,7 @@ public class ClientApp {
 
     public static void main(String[] args) throws Exception {
         FXController fxController = new FXController();
-        Thread networkThread = null;
+        Thread networkThread;
 
         try {
             CountDownLatch countDownNetworkConnections = new CountDownLatch(1);

@@ -15,20 +15,15 @@ import javax.swing.*;
 
 public class FXController extends Application {
 
-    private Scene authScene;
-
-    private Stage stage;
-
     @Override
     public void start(Stage stage) throws Exception {
-        this.stage = stage;
         ReplaceSceneManager.setStage(stage);
 
         FXMLLoader loader = new FXMLLoader(ClientApp.class.getResource("authPanel.fxml"));
-        authScene = new Scene(loader.load());
+        Scene authScene = new Scene(loader.load());
 
-        this.stage.setTitle("Home cloud Authorizing");
-        this.stage.setScene(authScene);
+        stage.setTitle("Home cloud Authorizing");
+        stage.setScene(authScene);
 
         Network.getNetwork().setCallbackAuthenticated(resultAuth -> {
             if (resultAuth) {
