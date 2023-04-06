@@ -30,6 +30,14 @@ public class Controller implements Initializable {
         AppControllers.setController(this);
     }
 
+    public void btnChangePassword(ActionEvent actionEvent) {
+        ReplaceSceneManager.replaceSceneContent("changePasswordPanel.fxml", "Change password");
+    }
+
+    public void btnUpdateFileList(ActionEvent actionEvent) {
+        Network.getNetwork().getChannel().writeAndFlush(new RequestList());
+    }
+
     public void btnUploadAction(ActionEvent actionEvent) {
         PanelController tLeftPanel = (PanelController) leftPanel.getProperties().get("ctrl");
         Path uploadFile;
@@ -86,12 +94,8 @@ public class Controller implements Initializable {
         tRightPanel.updateCloudList(list);
     }
 
-    public void btnUpdateFileList(ActionEvent actionEvent) {
-        Network.getNetwork().getChannel().writeAndFlush(new RequestList());
-    }
 
-    public void btnChangePassword(ActionEvent actionEvent) {
-        ReplaceSceneManager.replaceSceneContent("changePasswordPanel.fxml", "Change password");
+    public void btnDeleteFile(ActionEvent actionEvent) {
     }
 
     public void btnExitAction(ActionEvent actionEvent) {
