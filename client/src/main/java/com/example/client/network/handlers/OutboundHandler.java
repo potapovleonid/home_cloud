@@ -51,6 +51,9 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 sendRequestChangePassword(ctx, req);
                 return;
             }
+            if (obj instanceof RequestDeleteFile){
+//                TODO
+            }
             throw new IllegalArgumentException("Unknown outbound command");
         }
     }

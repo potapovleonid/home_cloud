@@ -96,6 +96,7 @@ public class Controller implements Initializable {
 
 
     public void btnDeleteFile(ActionEvent actionEvent) {
+//        TODO
     }
 
     public void btnExitAction(ActionEvent actionEvent) {
