@@ -7,7 +7,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
