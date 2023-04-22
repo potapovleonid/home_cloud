@@ -9,6 +9,9 @@ import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -83,13 +86,24 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             receivedFileLength = 0L;
             handlerState = HandlerState.NAME_LENGTH;
             logger.info("File state is user send file");
+            return;
         }
         if (checkState == SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte()) {
             logger.info("File sending success");
+            return;
         }
         if (checkState == SignalBytes.LIST_SENDING.getSignalByte()) {
             handlerState = HandlerState.LIST_LENGTH;
             logger.info("Send file list");
+            return;
+        }
+        if (checkState == SignalBytes.CHANGE_PASSWORD_SUCCESS.getSignalByte()){
+            Platform.runLater(() -> new Alert(null, "Password changed successfully", ButtonType.OK).showAndWait());
+            return;
+        }
+        if (checkState == SignalBytes.CHANGE_PASSWORD_FAILED.getSignalByte()) {
+            Platform.runLater(() -> new Alert(Alert.AlertType.WARNING, "Password changed failed", ButtonType.OK).showAndWait());
+            return;
         }
     }
 

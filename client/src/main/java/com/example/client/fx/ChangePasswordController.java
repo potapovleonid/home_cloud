@@ -26,10 +26,12 @@ public class ChangePasswordController {
         if (oldPassword.getText().length() < 5 || newPassword.getText().length() < 5){
             JOptionPane.showMessageDialog(null, "Old or new password is short",
                     "Short password", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
         if (Objects.equals(oldPassword.getText(), newPassword.getText())){
             JOptionPane.showMessageDialog(null, "Old and new password is identical",
                     "Identical passwords", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
         Platform.runLater(() -> Network.getNetwork().getChannel().writeAndFlush(new RequestChangePassword(oldPassword.getText(), newPassword.getText())));
     }
