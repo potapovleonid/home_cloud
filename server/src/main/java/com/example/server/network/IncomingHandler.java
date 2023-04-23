@@ -30,7 +30,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     private long receivedFileLength;
 
     private String oldPassword;
-    private String newPasswords;
+    private String newPassword;
 
     private String pathSaveFiles;
     private final Logger logger;
@@ -127,12 +127,15 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             logger.info("Get request change password");
             readingOldAndNewPasswords(buf);
             if (checkPasswords()) {
-                boolean result = SQLConnection.changePassword(login, oldPassword, newPasswords);
+                boolean result = SQLConnection.changePassword(login, oldPassword, newPassword);
                 logger.info("Result changing password is: " + result);
-                sendSignalByte(ctx, SignalBytes.CHANGE_PASSWORD_SUCCESS.getSignalByte());
+                if (result){
+                    sendSignalByte(ctx, SignalBytes.CHANGE_PASSWORD_SUCCESS.getSignalByte());
+                } else {
+                    sendSignalByte(ctx, SignalBytes.CHANGE_PASSWORD_FAILED.getSignalByte());
+                }
                 return;
             }
-            sendSignalByte(ctx, SignalBytes.CHANGE_PASSWORD_FAILED.getSignalByte());
             return;
         }
     }
@@ -161,7 +164,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
             if (type == typeValues.NEW_PASSWORD) {
-                newPasswords = new String(byteBufFilename, StandardCharsets.UTF_8);
+                newPassword = new String(byteBufFilename, StandardCharsets.UTF_8);
             }
         }
     }
@@ -260,6 +263,9 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private boolean checkPasswords() {
-        return !newPasswords.equals(oldPassword);
+        if (new String(oldPassword.getBytes(StandardCharsets.UTF_8)).length() < 5 || new String(newPassword.getBytes(StandardCharsets.UTF_8)).length() < 5) {
+            return false;
+        }
+        return !newPassword.equals(oldPassword);
     }
 }

@@ -129,7 +129,6 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
         FileSender.sendFile(
                 file.getFilePath(),
                 ctx,
-//                TODO check signal byte or success upload
                 file.getChannelFutureListener(),
                 file.getLogger()
         );
