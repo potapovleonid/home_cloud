@@ -117,6 +117,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     private void readingFilesList(ByteBuf buf) throws IOException, ClassNotFoundException {
         //            TODO crash after 4-5 runs
+        logger.info("Readable bytes from buffer: " + buf.readableBytes() + " from waiting list length: " + listLength);
         if (buf.readableBytes() >= listLength) {
             logger.info("start download list");
 
