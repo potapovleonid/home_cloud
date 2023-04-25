@@ -51,8 +51,9 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 sendRequestChangePassword(ctx, req);
                 return;
             }
-            if (obj instanceof RequestDeleteFile){
-//                TODO
+            if (obj instanceof RequestDeleteFile) {
+                RequestDeleteFile req = (RequestDeleteFile) obj;
+                sendRequestDeleteFile(ctx, req);
             }
             throw new IllegalArgumentException("Unknown outbound command");
         }
@@ -135,7 +136,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
     }
 
     private void sendRequestChangePassword(ChannelHandlerContext ctx, RequestChangePassword req) {
-        LoggerApp.info("get request change pass");
+        LoggerApp.info("Change password request received");
 
         byte[] bytesOldPassword = req.getBytesOldPassword();
         int lengthBytesOldPassword = bytesOldPassword.length;
@@ -154,4 +155,22 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
 
         ctx.writeAndFlush(buf);
     }
+
+    private void sendRequestDeleteFile(ChannelHandlerContext ctx, RequestDeleteFile req) {
+        LoggerApp.info("File deletion request received");
+        String filename = req.getFilename();
+
+        byte[] bytesFilename = filename.getBytes(StandardCharsets.UTF_8);
+        int lengthBytesFileName = bytesFilename.length;
+
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength()
+                + LengthBytesDataTypes.INT.getLength() + lengthBytesFileName);
+
+        buf.writeByte(SignalBytes.FILE_DELETE_REQUEST.getSignalByte());
+        buf.writeInt(lengthBytesFileName);
+        buf.writeBytes(bytesFilename);
+
+        ctx.writeAndFlush(buf);
+    }
+
 }

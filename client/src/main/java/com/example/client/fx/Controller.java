@@ -2,6 +2,7 @@ package com.example.client.fx;
 
 import com.example.client.LoggerApp;
 import com.example.client.network.Network;
+import com.example.client.network.networking.RequestDeleteFile;
 import com.example.client.network.networking.RequestFile;
 import com.example.client.network.networking.RequestList;
 import com.example.client.network.handlers.AppControllers;
@@ -96,7 +97,14 @@ public class Controller implements Initializable {
 
 
     public void btnDeleteFile(ActionEvent actionEvent) {
-//        TODO
+        PanelController tRightPanel = (PanelController) rightPanel.getProperties().get("ctrl");
+
+        if (tRightPanel.getSelectedFilename() != null){
+            LoggerApp.info("File for deleting is " + tRightPanel.getSelectedFilename());
+            Network.getNetwork().getChannel().writeAndFlush(new RequestDeleteFile(tRightPanel.getSelectedFilename()));
+        } else {
+            JOptionPane.showMessageDialog(null, "File for deleted isn't selected");
+        }
     }
 
     public void btnExitAction(ActionEvent actionEvent) {

@@ -92,6 +92,14 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             logger.info("File sending success");
             return;
         }
+        if (checkState == SignalBytes.FILE_DELETE_SUCCESS.getSignalByte()){
+            Platform.runLater(() -> new Alert(null, "File deleted successfully", ButtonType.OK).showAndWait());
+            return;
+        }
+        if (checkState == SignalBytes.FILE_DELETE_FAILED.getSignalByte()){
+            Platform.runLater(() -> new Alert(null, "File not deleted", ButtonType.OK).showAndWait());
+            return;
+        }
         if (checkState == SignalBytes.LIST_SENDING.getSignalByte()) {
             handlerState = HandlerState.LIST_LENGTH;
             logger.info("Send file list");

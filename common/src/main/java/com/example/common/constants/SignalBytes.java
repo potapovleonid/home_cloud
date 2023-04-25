@@ -4,7 +4,9 @@ public enum SignalBytes {
     FILE_REQUEST((byte) 10),
     FILE_SENDING((byte) 11),
     FILE_RECEIVED_SUCCESS((byte) 12),
-    FILE_DELETE((byte) 13),
+    FILE_DELETE_REQUEST((byte) 13),
+    FILE_DELETE_SUCCESS((byte) 14),
+    FILE_DELETE_FAILED((byte) 15),
 
     LIST_REQUEST((byte) 20),
     LIST_SENDING((byte) 21),
