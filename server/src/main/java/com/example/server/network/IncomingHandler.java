@@ -4,6 +4,7 @@ import com.example.common.constants.HandlerState;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
 import com.example.common.network.FileSender;
+import com.example.server.LoggerApp;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -114,6 +115,16 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             swapHandlerState(HandlerState.REQUEST_NAME_LENGTH, "Request file");
             return;
         }
+        if (checkState == SignalBytes.FILE_DELETE_REQUEST.getSignalByte()){
+            readingStringLength(buf);
+            readingStringOnLength(buf, typeValues.FILENAME);
+            if (deleteFile()){
+                sendSignalByte(ctx, SignalBytes.FILE_DELETE_SUCCESS.getSignalByte());
+                return;
+            }
+            sendSignalByte(ctx, SignalBytes.FILE_DELETE_FAILED.getSignalByte());
+            return;
+        }
         if (checkState == SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte()) {
             logger.info("File sending success");
             return;
@@ -167,6 +178,16 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
                 newPassword = new String(byteBufFilename, StandardCharsets.UTF_8);
             }
         }
+    }
+
+    private boolean deleteFile() {
+        try {
+            Files.delete(Paths.get(pathSaveFiles, filename));
+            return true;
+        } catch (IOException e) {
+            LoggerApp.info("File not find. Search file: " + pathSaveFiles + FileSystems.getDefault().getSeparator() + filename);
+        }
+        return false;
     }
 
     private void checkExistFileAndCreateOutput() {
