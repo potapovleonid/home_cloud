@@ -28,23 +28,23 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         }
         ByteBuf buf = (ByteBuf) msg;
         byte checkResponse = buf.readByte();
-        if (checkResponse == SignalBytes.SUCCESS_AUTH.getSignalByte()) {
+        if (checkResponse == SignalBytes.AUTHORIZE_SUCCESS.getSignalByte()) {
             authResult = true;
-            logger.info("Get signal byte " + SignalBytes.SUCCESS_AUTH.getSignalByte() + " - Authorize is success");
+            logger.info("Get signal byte " + SignalBytes.AUTHORIZE_SUCCESS.getSignalByte() + " - Authorize is success");
             callbackAuthenticated.isAuthorize(true);
         }
-        if (checkResponse == SignalBytes.FAILED_AUTH.getSignalByte()){
-            logger.info("Get signal byte " + SignalBytes.FAILED_AUTH.getSignalByte() + " - Authorize is fail");
+        if (checkResponse == SignalBytes.AUTHORIZE_FAILED.getSignalByte()){
+            logger.info("Get signal byte " + SignalBytes.AUTHORIZE_FAILED.getSignalByte() + " - Authorize is fail");
             callbackAuthenticated.isAuthorize(false);
         }
-        if (checkResponse == SignalBytes.SUCCESS_REGISTER_USER.getSignalByte()){
-            logger.info("Get signal byte " + SignalBytes.SUCCESS_REGISTER_USER.getSignalByte() + " - Register new user is success");
+        if (checkResponse == SignalBytes.REGISTER_USER_SUCCESS.getSignalByte()){
+            logger.info("Get signal byte " + SignalBytes.REGISTER_USER_SUCCESS.getSignalByte() + " - Register new user is success");
             Platform.runLater(() ->
                     new Alert(Alert.AlertType.INFORMATION, "New user successfully created", ButtonType.OK).showAndWait()
             );
         }
-        if (checkResponse == SignalBytes.FAILED_REGISTER_USER.getSignalByte()){
-            logger.info("Get signal byte " + SignalBytes.FAILED_REGISTER_USER.getSignalByte() + " - Register new user is fail");
+        if (checkResponse == SignalBytes.REGISTER_USER_FAILED.getSignalByte()){
+            logger.info("Get signal byte " + SignalBytes.REGISTER_USER_FAILED.getSignalByte() + " - Register new user is fail");
             Platform.runLater(() ->
                     new Alert(Alert.AlertType.WARNING, "Username is already in use", ButtonType.OK).showAndWait()
             );

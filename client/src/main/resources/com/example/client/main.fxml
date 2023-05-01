@@ -12,6 +12,7 @@
       fx:controller="com.example.client.fx.Controller">
     <MenuBar>
         <Menu text="File">
+            <MenuItem text="Change password" onAction="#btnChangePassword"/>
             <MenuItem text="Exit" onAction="#btnExitAction"/>
         </Menu>
     </MenuBar>
@@ -24,6 +25,7 @@
         <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Update file list" onAction="#btnUpdateFileList"/>
         <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Upload on server" onAction="#btnUploadAction"/>
         <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Download to computer" onAction="#btnDownloadAction"/>
+        <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Delete file on server" onAction="#btnDeleteFile"/>
         <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" focusTraversable="false" text="Exit" onAction="#btnExitAction"/>
         <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

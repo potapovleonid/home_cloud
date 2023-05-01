@@ -26,7 +26,6 @@ public class Network {
         EventLoopGroup group = new NioEventLoopGroup();
 
         try{
-
             Bootstrap clientBootstrap = new Bootstrap();
             clientBootstrap
                     .group(group)

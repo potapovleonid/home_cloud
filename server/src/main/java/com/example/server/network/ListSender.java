@@ -25,13 +25,21 @@ public class ListSender {
 
             ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4);
 
-            buf.writeByte(SignalBytes.SENDING_LIST.getSignalByte());
+            logger.info("Length list: " + listFilesLength);
+
+            buf.writeByte(SignalBytes.LIST_SENDING.getSignalByte());
             buf.writeInt(listFilesLength);
 
-            channel.writeAndFlush(buf);
+            logger.info("Length signal byte + int: " + buf.readableBytes() + " bytes");
+
+//            TODO check
+            channel.write(buf);
 
             buf = ByteBufAllocator.DEFAULT.directBuffer(listFilesLength);
             buf.writeBytes(bytesOfTheList);
+
+            logger.info("Length file list in buffer: " + buf.readableBytes() + " bytes");
+
             channel.writeAndFlush(buf);
             logger.info("Server sent file list");
         } catch (IOException e) {

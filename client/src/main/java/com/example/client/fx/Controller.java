@@ -2,6 +2,7 @@ package com.example.client.fx;
 
 import com.example.client.LoggerApp;
 import com.example.client.network.Network;
+import com.example.client.network.networking.RequestDeleteFile;
 import com.example.client.network.networking.RequestFile;
 import com.example.client.network.networking.RequestList;
 import com.example.client.network.handlers.AppControllers;
@@ -11,8 +12,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 
 import javax.swing.*;
@@ -32,8 +31,12 @@ public class Controller implements Initializable {
         AppControllers.setController(this);
     }
 
-    public void btnExitAction(ActionEvent actionEvent) {
-        Platform.exit();
+    public void btnChangePassword(ActionEvent actionEvent) {
+        ReplaceSceneManager.replaceSceneContent("changePasswordPanel.fxml", "Change password");
+    }
+
+    public void btnUpdateFileList(ActionEvent actionEvent) {
+        Network.getNetwork().getChannel().writeAndFlush(new RequestList());
     }
 
     public void btnUploadAction(ActionEvent actionEvent) {
@@ -43,14 +46,14 @@ public class Controller implements Initializable {
         try {
             uploadFile = tLeftPanel.getCurrentPath().resolve(tLeftPanel.getSelectedFilename());
         } catch (NullPointerException e){
-            new Alert(Alert.AlertType.ERROR, "No one file isn't selected for upload",
-                    ButtonType.OK).showAndWait();
+            JOptionPane.showMessageDialog(null, "No one file isn't selected for upload",
+                    "Select file", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
         if (Files.isDirectory(uploadFile)) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Select file is directory", ButtonType.OK);
-            alert.showAndWait();
+            JOptionPane.showMessageDialog(null, "Select file is directory",
+                    "Select file", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -82,8 +85,8 @@ public class Controller implements Initializable {
             LoggerApp.info("Send request on download file: " + tRightPanel.getSelectedFilename());
             Network.getNetwork().getChannel().writeAndFlush(new RequestFile(tRightPanel.getSelectedFilename()));
         } else {
-            new Alert(Alert.AlertType.ERROR, "No one file isn't selected for download",
-                    ButtonType.OK).showAndWait();
+            JOptionPane.showMessageDialog(null, "No one file isn't selected for download",
+                    "Select file", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -92,7 +95,21 @@ public class Controller implements Initializable {
         tRightPanel.updateCloudList(list);
     }
 
-    public void btnUpdateFileList(ActionEvent actionEvent) {
-        Network.getNetwork().getChannel().writeAndFlush(new RequestList());
+
+    public void btnDeleteFile(ActionEvent actionEvent) {
+        PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
+
+        if (tRightPanel.getSelectedFilename() != null){
+            LoggerApp.info("File for deleting is " + tRightPanel.getSelectedFilename());
+            Network.getNetwork().getChannel().writeAndFlush(new RequestDeleteFile(tRightPanel.getSelectedFilename()));
+        } else {
+            JOptionPane.showMessageDialog(null, "File for deleted isn't selected");
+        }
     }
+
+    public void btnExitAction(ActionEvent actionEvent) {
+        Platform.exit();
+        System.exit(0);
+    }
+
 }

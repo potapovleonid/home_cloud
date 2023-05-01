@@ -7,7 +7,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
@@ -32,11 +34,11 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         byte signal = buf.readByte();
 
-        if (signal == SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte()) {
+        if (signal == SignalBytes.REGISTER_NEW_USER_REQUEST.getSignalByte()) {
             getRequestAndRegisterNewUser(ctx, buf);
         }
 
-        if (signal == SignalBytes.REQUEST_AUTHORIZE.getSignalByte()) {
+        if (signal == SignalBytes.AUTHORIZE_REQUEST.getSignalByte()) {
             getRequestAndAuthorize(ctx, buf);
         }
     }
@@ -49,7 +51,7 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
 
         boolean resultRegisterUser = SQLConnection.addUser(login, password);
 
-        sendResponseResultAndClearCredentials(ctx, resultRegisterUser, SignalBytes.SUCCESS_REGISTER_USER, SignalBytes.FAILED_REGISTER_USER);
+        sendResponseResultAndClearCredentials(ctx, resultRegisterUser, SignalBytes.REGISTER_USER_SUCCESS, SignalBytes.REGISTER_USER_FAILED);
     }
 
     private void getRequestAndAuthorize(ChannelHandlerContext ctx, ByteBuf buf) {
@@ -63,10 +65,11 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
         logger.info(String.format("Result auth: %b", resultAuth));
 
         if (resultAuth) {
-            sendResponseResultAndClearCredentials(ctx, resultAuth, SignalBytes.SUCCESS_AUTH, SignalBytes.FAILED_AUTH);
             ctx.fireChannelRead(login);
             clearPasswordAndLogin();
         }
+
+        sendResponseResultAndClearCredentials(ctx, resultAuth, SignalBytes.AUTHORIZE_SUCCESS, SignalBytes.AUTHORIZE_FAILED);
     }
 
     private void readAndSetLoginAndPassword(ByteBuf buf) {
@@ -107,7 +110,7 @@ public class AuthorizeHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void clearPasswordAndLogin() {
-        password = null;
         login = null;
+        password = null;
     }
 }

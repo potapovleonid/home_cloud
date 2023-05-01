@@ -1,5 +1,6 @@
 package com.example.client.network.handlers;
 
+import com.example.client.LoggerApp;
 import com.example.client.network.networking.*;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
@@ -45,6 +46,15 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 sendFile(ctx, file);
                 return;
             }
+            if (obj instanceof RequestChangePassword) {
+                RequestChangePassword req = (RequestChangePassword) obj;
+                sendRequestChangePassword(ctx, req);
+                return;
+            }
+            if (obj instanceof RequestDeleteFile) {
+                RequestDeleteFile req = (RequestDeleteFile) obj;
+                sendRequestDeleteFile(ctx, req);
+            }
             throw new IllegalArgumentException("Unknown outbound command");
         }
     }
@@ -59,7 +69,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 LengthBytesDataTypes.INT.getLength() + lengthLogin +
                 LengthBytesDataTypes.INT.getLength() + lengthPassword);
 
-        buf.writeByte(SignalBytes.REQUEST_AUTHORIZE.getSignalByte());
+        buf.writeByte(SignalBytes.AUTHORIZE_REQUEST.getSignalByte());
         buf.writeInt(lengthLogin);
         buf.writeBytes(bytesLogin);
         buf.writeInt(lengthPassword);
@@ -78,7 +88,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 LengthBytesDataTypes.INT.getLength() + lengthLogin +
                 LengthBytesDataTypes.INT.getLength() + lengthPassword);
 
-        buf.writeByte(SignalBytes.REQUEST_REGISTER_NEW_USER.getSignalByte());
+        buf.writeByte(SignalBytes.REGISTER_NEW_USER_REQUEST.getSignalByte());
         buf.writeInt(lengthLogin);
         buf.writeBytes(bytesLogin);
         buf.writeInt(lengthPassword);
@@ -94,7 +104,7 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength() +
                 LengthBytesDataTypes.INT.getLength() + lengthFilename);
 
-        buf.writeByte(SignalBytes.REQUEST_FILE.getSignalByte());
+        buf.writeByte(SignalBytes.FILE_REQUEST.getSignalByte());
         buf.writeInt(lengthFilename);
         buf.writeBytes(fileNameBytes);
 
@@ -104,15 +114,16 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
     private void sendResponseGetStatus(ChannelHandlerContext ctx, ResponseStatusComplete resp) {
         if (resp.isStatus()) {
             ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
-            buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
+            buf.writeByte(SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte());
             ctx.writeAndFlush(buf);
         }
     }
 
     private void sendRequestList(ChannelHandlerContext ctx) {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
-        buf.writeByte(SignalBytes.REQUEST_LIST.getSignalByte());
+        buf.writeByte(SignalBytes.LIST_REQUEST.getSignalByte());
         ctx.writeAndFlush(buf);
+        LoggerApp.info("Sent request list");
     }
 
     private void sendFile(ChannelHandlerContext ctx, SendFile file) throws IOException {
@@ -123,4 +134,43 @@ public class OutboundHandler extends ChannelOutboundHandlerAdapter {
                 file.getLogger()
         );
     }
+
+    private void sendRequestChangePassword(ChannelHandlerContext ctx, RequestChangePassword req) {
+        LoggerApp.info("Change password request received");
+
+        byte[] bytesOldPassword = req.getBytesOldPassword();
+        int lengthBytesOldPassword = bytesOldPassword.length;
+        byte[] bytesNewPassword = req.getBytesNewPassword();
+        int lengthBytesNewPassword = bytesNewPassword.length;
+
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength()
+                + LengthBytesDataTypes.INT.getLength() + lengthBytesOldPassword
+                + LengthBytesDataTypes.INT.getLength() + lengthBytesNewPassword);
+
+        buf.writeByte(SignalBytes.CHANGE_PASSWORD_REQUEST.getSignalByte());
+        buf.writeInt(lengthBytesOldPassword);
+        buf.writeBytes(bytesOldPassword);
+        buf.writeInt(lengthBytesNewPassword);
+        buf.writeBytes(bytesNewPassword);
+
+        ctx.writeAndFlush(buf);
+    }
+
+    private void sendRequestDeleteFile(ChannelHandlerContext ctx, RequestDeleteFile req) {
+        LoggerApp.info("File deletion request received");
+        String filename = req.getFilename();
+
+        byte[] bytesFilename = filename.getBytes(StandardCharsets.UTF_8);
+        int lengthBytesFileName = bytesFilename.length;
+
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength()
+                + LengthBytesDataTypes.INT.getLength() + lengthBytesFileName);
+
+        buf.writeByte(SignalBytes.FILE_DELETE_REQUEST.getSignalByte());
+        buf.writeInt(lengthBytesFileName);
+        buf.writeBytes(bytesFilename);
+
+        ctx.writeAndFlush(buf);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.example.client.network.handlers;
 
 import com.example.client.callbacks.CallbackGettingFileList;
+import com.example.client.network.networking.RequestList;
 import com.example.client.network.networking.ResponseStatusComplete;
 import com.example.common.FileInfo;
 import com.example.common.constants.HandlerState;
@@ -9,6 +10,9 @@ import com.example.common.constants.SignalBytes;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -50,7 +54,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         while (buf.readableBytes() > 0) {
             switch (handlerState) {
                 case IDLE:
-                    checkingSignalByte(buf);
+                    checkingSignalByte(buf, ctx);
                     break;
                 case LIST_LENGTH:
                     readingFileListLength(buf);
@@ -77,19 +81,40 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void checkingSignalByte(ByteBuf buf) {
+    private void checkingSignalByte(ByteBuf buf, ChannelHandlerContext ctx) {
         byte checkState = buf.readByte();
-        if (checkState == SignalBytes.SENDING_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_SENDING.getSignalByte()) {
             receivedFileLength = 0L;
             handlerState = HandlerState.NAME_LENGTH;
             logger.info("File state is user send file");
+            return;
         }
-        if (checkState == SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte()) {
             logger.info("File sending success");
+            return;
         }
-        if (checkState == SignalBytes.SENDING_LIST.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_DELETE_SUCCESS.getSignalByte()){
+            Platform.runLater(() -> new Alert(null, "File deleted successfully", ButtonType.OK).showAndWait());
+            ctx.writeAndFlush(new RequestList());
+            return;
+        }
+        if (checkState == SignalBytes.FILE_DELETE_FAILED.getSignalByte()){
+            Platform.runLater(() -> new Alert(null, "File not deleted", ButtonType.OK).showAndWait());
+            return;
+        }
+        if (checkState == SignalBytes.LIST_SENDING.getSignalByte()) {
+//            TODO read list here
             handlerState = HandlerState.LIST_LENGTH;
             logger.info("Send file list");
+            return;
+        }
+        if (checkState == SignalBytes.CHANGE_PASSWORD_SUCCESS.getSignalByte()){
+            Platform.runLater(() -> new Alert(null, "Password changed successfully", ButtonType.OK).showAndWait());
+            return;
+        }
+        if (checkState == SignalBytes.CHANGE_PASSWORD_FAILED.getSignalByte()) {
+            Platform.runLater(() -> new Alert(Alert.AlertType.WARNING, "Password changed failed", ButtonType.OK).showAndWait());
+            return;
         }
     }
 
@@ -102,6 +127,8 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingFilesList(ByteBuf buf) throws IOException, ClassNotFoundException {
+        //            TODO crash after 4-5 runs
+        logger.info("Readable bytes from buffer: " + buf.readableBytes() + " from waiting list length: " + listLength);
         if (buf.readableBytes() >= listLength) {
             logger.info("start download list");
 
@@ -114,7 +141,6 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             List<FileInfo> filesList = (List<FileInfo>) ois.readObject();
 
             logger.info(String.format("Files list length %d", filesList.toArray().length));
-
             filesList.forEach(s -> System.out.println(s.toString()));
             handlerState = HandlerState.IDLE;
             logger.info("State: " + handlerState);

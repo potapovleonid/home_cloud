@@ -23,4 +23,9 @@ public class LoggerApp {
         checkExistsLoggerAndCreate();
         logger.info(msg);
     }
+
+    public static void warn(String msg){
+        checkExistsLoggerAndCreate();
+        logger.warn(msg);
+    }
 }

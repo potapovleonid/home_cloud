@@ -4,6 +4,7 @@ import com.example.common.constants.HandlerState;
 import com.example.common.constants.LengthBytesDataTypes;
 import com.example.common.constants.SignalBytes;
 import com.example.common.network.FileSender;
+import com.example.server.LoggerApp;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,13 +16,22 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
 public class IncomingHandler extends ChannelInboundHandlerAdapter {
+    private enum typeValues {
+        FILENAME, OLD_PASSWORD, NEW_PASSWORD
+    }
+
+    private String login;
     private HandlerState handlerState = HandlerState.IDLE;
 
-    private int filenameLength;
+    private int stringLength;
     private String filename;
+
+    private BufferedOutputStream out;
     private long fileLength;
     private long receivedFileLength;
-    private BufferedOutputStream out;
+
+    private String oldPassword;
+    private String newPassword;
 
     private String pathSaveFiles;
     private final Logger logger;
@@ -52,11 +62,11 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
                     checkingSignalByte(buf, ctx);
                     break;
                 case NAME_LENGTH:
-                    readingFilenameLength(buf);
-                    swapHandlerState(HandlerState.NAME, "Length name: " + filenameLength + " bytes");
+                    readingStringLength(buf);
+                    swapHandlerState(HandlerState.NAME, "Length name: " + stringLength + " bytes");
                     break;
                 case NAME:
-                    readingFilename(buf);
+                    readingStringOnLength(buf, typeValues.FILENAME);
                     checkExistFileAndCreateOutput();
                     swapHandlerState(HandlerState.FILE_LENGTH, "Filename: " + filename);
                     break;
@@ -86,6 +96,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     private boolean checkAndSetUserLoginIfMsgIsLogin(Object msg) {
         if (msg instanceof String) {
             String userLogin = (String) msg;
+            login = userLogin;
             pathSaveFiles += FileSystems.getDefault().getSeparator() + userLogin;
             logger.info("Set path save files: " + pathSaveFiles);
             return true;
@@ -95,21 +106,48 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
 
     private void checkingSignalByte(ByteBuf buf, ChannelHandlerContext ctx) {
         byte checkState = buf.readByte();
-        if (checkState == SignalBytes.SENDING_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_SENDING.getSignalByte()) {
             receivedFileLength = 0L;
             swapHandlerState(HandlerState.NAME_LENGTH, "File state is user send file");
+            return;
         }
-        if (checkState == SignalBytes.REQUEST_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_REQUEST.getSignalByte()) {
             swapHandlerState(HandlerState.REQUEST_NAME_LENGTH, "Request file");
+            return;
         }
-        if (checkState == SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte()) {
+        if (checkState == SignalBytes.FILE_DELETE_REQUEST.getSignalByte()){
+            readingStringLength(buf);
+            readingStringOnLength(buf, typeValues.FILENAME);
+            if (deleteFile()){
+                sendSignalByte(ctx, SignalBytes.FILE_DELETE_SUCCESS.getSignalByte());
+                return;
+            }
+            sendSignalByte(ctx, SignalBytes.FILE_DELETE_FAILED.getSignalByte());
+            return;
+        }
+        if (checkState == SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte()) {
             logger.info("File sending success");
+            return;
         }
-        if (checkState == SignalBytes.REQUEST_LIST.getSignalByte()) {
+        if (checkState == SignalBytes.LIST_REQUEST.getSignalByte()) {
+            logger.info("Send file list");
             sendFileList(ctx);
+            return;
         }
-        if (checkState == SignalBytes.REQUEST_CHANGE_PASSWORD.getSignalByte()){
-//            TODO
+        if (checkState == SignalBytes.CHANGE_PASSWORD_REQUEST.getSignalByte()) {
+            logger.info("Get request change password");
+            readingOldAndNewPasswords(buf);
+            if (checkPasswords()) {
+                boolean result = SQLConnection.changePassword(login, oldPassword, newPassword);
+                logger.info("Result changing password is: " + result);
+                if (result){
+                    sendSignalByte(ctx, SignalBytes.CHANGE_PASSWORD_SUCCESS.getSignalByte());
+                } else {
+                    sendSignalByte(ctx, SignalBytes.CHANGE_PASSWORD_FAILED.getSignalByte());
+                }
+                return;
+            }
+            return;
         }
     }
 
@@ -118,23 +156,42 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         logger.info(loggerMsg);
     }
 
-    private void readingFilenameLength(ByteBuf buf) {
+    private void readingStringLength(ByteBuf buf) {
         if (buf.readableBytes() >= LengthBytesDataTypes.INT.getLength()) {
-            filenameLength = buf.readInt();
+            stringLength = buf.readInt();
         }
     }
 
-    private void readingFilename(ByteBuf buf) {
-        if (buf.readableBytes() >= filenameLength) {
-            byte[] byteBufFilename = new byte[filenameLength];
+    private void readingStringOnLength(ByteBuf buf, typeValues type) {
+        if (buf.readableBytes() >= stringLength) {
+            byte[] byteBufFilename = new byte[stringLength];
             buf.readBytes(byteBufFilename);
-            filename = new String(byteBufFilename, StandardCharsets.UTF_8);
+            if (type == typeValues.FILENAME) {
+                filename = new String(byteBufFilename, StandardCharsets.UTF_8);
+                return;
+            }
+            if (type == typeValues.OLD_PASSWORD) {
+                oldPassword = new String(byteBufFilename, StandardCharsets.UTF_8);
+                return;
+            }
+            if (type == typeValues.NEW_PASSWORD) {
+                newPassword = new String(byteBufFilename, StandardCharsets.UTF_8);
+            }
         }
+    }
+
+    private boolean deleteFile() {
+        try {
+            Files.delete(Paths.get(pathSaveFiles, filename));
+            return true;
+        } catch (IOException e) {
+            LoggerApp.info("File not find. Search file: " + pathSaveFiles + FileSystems.getDefault().getSeparator() + filename);
+        }
+        return false;
     }
 
     private void checkExistFileAndCreateOutput() {
         checkExistsFilePathAndCreate();
-
         try {
             out = new BufferedOutputStream(new FileOutputStream(pathSaveFiles +
                     FileSystems.getDefault().getSeparator() + filename));
@@ -167,26 +224,29 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             if (receivedFileLength == fileLength) {
                 swapHandlerState(HandlerState.IDLE, "File received");
                 out.close();
-                successfullyReceivedFile(ctx);
+                out = null;
+                sendSignalByte(ctx, SignalBytes.FILE_RECEIVED_SUCCESS.getSignalByte());
+                ListSender.sendList(Paths.get(pathSaveFiles), ctx.channel(), logger);
                 break;
             }
         }
     }
 
-    private void successfullyReceivedFile(ChannelHandlerContext ctx) {
+    private void sendSignalByte(ChannelHandlerContext ctx, byte signalByte) {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(LengthBytesDataTypes.SIGNAL_BYTE.getLength());
-        buf.writeByte(SignalBytes.RECEIVED_SUCCESS_FILE.getSignalByte());
+        logger.info("Byte: " + signalByte);
+        buf.writeByte(signalByte);
         ctx.writeAndFlush(buf);
-        ListSender.sendList(Paths.get(pathSaveFiles), ctx.channel(), logger);
     }
 
+
     private void readRequestFilenameLength(ByteBuf buf) {
-        readingFilenameLength(buf);
-        swapHandlerState(HandlerState.REQUEST_NAME, "Filename length " + filenameLength);
+        readingStringLength(buf);
+        swapHandlerState(HandlerState.REQUEST_NAME, "Filename length " + stringLength);
     }
 
     private void readingRequestFilenameAndSendFile(ByteBuf buf, ChannelHandlerContext ctx) {
-        readingFilename(buf);
+        readingStringOnLength(buf, typeValues.FILENAME);
         sendRequestFile(ctx);
         swapHandlerState(HandlerState.IDLE, "Request filename: " + filename);
     }
@@ -213,5 +273,20 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         }
         logger.warn(cause.getMessage());
         ctx.close();
+    }
+
+    private void readingOldAndNewPasswords(ByteBuf buf) {
+        readingStringLength(buf);
+        readingStringOnLength(buf, typeValues.OLD_PASSWORD);
+        readingStringLength(buf);
+        readingStringOnLength(buf, typeValues.NEW_PASSWORD);
+        logger.info("Reading passwords completed");
+    }
+
+    private boolean checkPasswords() {
+        if (new String(oldPassword.getBytes(StandardCharsets.UTF_8)).length() < 5 || new String(newPassword.getBytes(StandardCharsets.UTF_8)).length() < 5) {
+            return false;
+        }
+        return !newPassword.equals(oldPassword);
     }
 }

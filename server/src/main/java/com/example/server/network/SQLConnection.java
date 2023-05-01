@@ -30,7 +30,7 @@ public class SQLConnection {
         }
     }
 
-    public static boolean addUser(String user, String password){
+    public static boolean addUser(String user, String password) {
         try {
             String sql = String.format("INSERT INTO users VALUES ('%s', '%s')", user, password);
             statement.executeUpdate(sql);
@@ -40,7 +40,7 @@ public class SQLConnection {
         }
     }
 
-    public static boolean authorizeUser(String login, String password){
+    public static boolean authorizeUser(String login, String password) {
         try {
             return isFindUser(login, password);
         } catch (SQLException e) {
@@ -49,15 +49,17 @@ public class SQLConnection {
         return false;
     }
 
-    public static synchronized boolean changePassword(String login, String oldPassword, String newPassword){
+    public static synchronized boolean changePassword(String login, String oldPassword, String newPassword) {
         try {
-            boolean result = isFindUser(login, oldPassword);
+            boolean findingResult = isFindUser(login, oldPassword);
+            LoggerApp.info("Finding result: " + findingResult);
             String sql;
-            if (result){
+            if (findingResult) {
                 sql = String.format("UPDATE users " +
-                                    "SET login = '%s', password = '%s' " +
-                                    "WHERE login = '%s', and password ='%s'", login, newPassword, login, oldPassword);
-                statement.executeQuery(sql);
+                        "SET login = '%s', password = '%s' " +
+                        "WHERE login = '%s' and password ='%s'", login, newPassword, login, oldPassword);
+
+                statement.executeUpdate(sql);
                 return true;
             }
             return false;
@@ -69,13 +71,13 @@ public class SQLConnection {
 
     private static boolean isFindUser(String login, String oldPassword) throws SQLException {
         String sql = String.format("SELECT login, password " +
-                                    "FROM users " +
-                                    "WHERE login = '%s' and password = '%s'", login, oldPassword);
+                "FROM users " +
+                "WHERE login = '%s' and password = '%s'", login, oldPassword);
         ResultSet rs = statement.executeQuery(sql);
         return rs.next();
     }
 
-    public static boolean deleteUser(String login, String password){
+    public static boolean deleteUser(String login, String password) {
         try {
             String sql = String.format("DELETE FROM users WHERE login ='%s' and password ='%s'", login, password);
             statement.executeUpdate(sql);
