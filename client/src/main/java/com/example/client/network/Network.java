@@ -30,7 +30,7 @@ public class Network {
             clientBootstrap
                     .group(group)
                     .channel(NioSocketChannel.class)
-                    .remoteAddress(ConfigApp.getIpAddress(), ConfigApp.getPort())
+                    .remoteAddress(ConfigApp.getConfig().getIpAddress(), ConfigApp.getConfig().getPort())
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sh) {
