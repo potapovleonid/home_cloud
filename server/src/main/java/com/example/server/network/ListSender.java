@@ -30,9 +30,10 @@ public class ListSender {
             buf.writeByte(SignalBytes.LIST_SENDING.getSignalByte());
             buf.writeInt(listFilesLength);
 
-            logger.info("Length signal bytes + int: " + buf.readableBytes() + " bytes");
+            logger.info("Length signal byte + int: " + buf.readableBytes() + " bytes");
 
-            channel.writeAndFlush(buf);
+//            TODO check
+            channel.write(buf);
 
             buf = ByteBufAllocator.DEFAULT.directBuffer(listFilesLength);
             buf.writeBytes(bytesOfTheList);
