@@ -97,7 +97,7 @@ public class Controller implements Initializable {
 
 
     public void btnDeleteFile(ActionEvent actionEvent) {
-        PanelController tRightPanel = (PanelController) rightPanel.getProperties().get("ctrl");
+        PanelCloudController tRightPanel = (PanelCloudController) rightPanel.getProperties().get("ctrl");
 
         if (tRightPanel.getSelectedFilename() != null){
             LoggerApp.info("File for deleting is " + tRightPanel.getSelectedFilename());

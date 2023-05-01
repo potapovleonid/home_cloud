@@ -1,6 +1,7 @@
 package com.example.client.network.handlers;
 
 import com.example.client.callbacks.CallbackGettingFileList;
+import com.example.client.network.networking.RequestList;
 import com.example.client.network.networking.ResponseStatusComplete;
 import com.example.common.FileInfo;
 import com.example.common.constants.HandlerState;
@@ -53,7 +54,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         while (buf.readableBytes() > 0) {
             switch (handlerState) {
                 case IDLE:
-                    checkingSignalByte(buf);
+                    checkingSignalByte(buf, ctx);
                     break;
                 case LIST_LENGTH:
                     readingFileListLength(buf);
@@ -80,7 +81,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void checkingSignalByte(ByteBuf buf) {
+    private void checkingSignalByte(ByteBuf buf, ChannelHandlerContext ctx) {
         byte checkState = buf.readByte();
         if (checkState == SignalBytes.FILE_SENDING.getSignalByte()) {
             receivedFileLength = 0L;
@@ -94,6 +95,7 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
         }
         if (checkState == SignalBytes.FILE_DELETE_SUCCESS.getSignalByte()){
             Platform.runLater(() -> new Alert(null, "File deleted successfully", ButtonType.OK).showAndWait());
+            ctx.writeAndFlush(new RequestList());
             return;
         }
         if (checkState == SignalBytes.FILE_DELETE_FAILED.getSignalByte()){
