@@ -107,7 +107,6 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         if (checkState == SignalBytes.LIST_SENDING.getSignalByte()) {
-//            TODO read list here
             handlerState = HandlerState.LIST_LENGTH;
             logger.info("Send file list");
             return;

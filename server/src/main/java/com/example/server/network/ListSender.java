@@ -32,7 +32,6 @@ public class ListSender {
 
             logger.info("Length signal byte + int: " + buf.readableBytes() + " bytes");
 
-//            TODO check
             channel.write(buf);
 
             buf = ByteBufAllocator.DEFAULT.directBuffer(listFilesLength);
