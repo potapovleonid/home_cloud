@@ -1,6 +1,7 @@
 package com.example.client.network.handlers;
 
 import com.example.client.callbacks.CallbackGettingFileList;
+import com.example.client.network.Network;
 import com.example.client.network.networking.RequestList;
 import com.example.client.network.networking.ResponseStatusComplete;
 import com.example.common.FileInfo;
@@ -29,6 +30,9 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     private long fileLength;
     private long receivedFileLength;
     private BufferedOutputStream out;
+
+    private int errorCount;
+    private final int maxErrorCount = 500;
 
     private String pathSaveFiles;
     private final Logger logger;
@@ -127,8 +131,15 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void readingFilesList(ByteBuf buf) throws IOException, ClassNotFoundException {
-        //            TODO crash after 4-5 runs
         logger.info("Readable bytes from buffer: " + buf.readableBytes() + " from waiting list length: " + listLength);
+        if (errorCount >= maxErrorCount){
+            logger.info("Try reading: " + errorCount + " from " + maxErrorCount);
+            handlerState = HandlerState.IDLE;
+            buf.clear();
+            Network.getNetwork().getChannel().writeAndFlush(new RequestList());
+            errorCount = 0;
+        }
+
         if (buf.readableBytes() >= listLength) {
             logger.info("start download list");
 
@@ -146,6 +157,8 @@ public class IncomingHandler extends ChannelInboundHandlerAdapter {
             logger.info("State: " + handlerState);
 
             callbackGettingFileList.getFileList(filesList);
+        } else {
+            errorCount++;
         }
     }
 
